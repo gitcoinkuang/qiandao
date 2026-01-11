@@ -16,27 +16,41 @@ PASSWORD_CONFIG_FILE = 'password_config.json'
 
 # 加载签到配置
 def load_configs():
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return []
+    try:
+        if os.path.exists(CONFIG_FILE) and os.path.isfile(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return []
+    except Exception as e:
+        print(f"加载配置文件失败: {e}")
+        return []
 
 # 保存签到配置
 def save_configs(configs):
-    with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(configs, f, ensure_ascii=False, indent=2)
+    try:
+        with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(configs, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"保存签到配置文件失败: {e}")
 
 # 加载通知配置
 def load_notify_config():
-    if os.path.exists(NOTIFY_CONFIG_FILE):
-        with open(NOTIFY_CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {'tg_bot_token': '', 'tg_chat_id': ''}
+    try:
+        if os.path.exists(NOTIFY_CONFIG_FILE) and os.path.isfile(NOTIFY_CONFIG_FILE):
+            with open(NOTIFY_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {'tg_bot_token': '', 'tg_chat_id': ''}
+    except Exception as e:
+        print(f"加载通知配置文件失败: {e}")
+        return {'tg_bot_token': '', 'tg_chat_id': ''}
 
 # 保存通知配置
 def save_notify_config(config):
-    with open(NOTIFY_CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
+    try:
+        with open(NOTIFY_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"保存通知配置文件失败: {e}")
 
 # 发送Telegram通知
 def send_telegram_notification(message):
@@ -95,28 +109,42 @@ def check_schedule():
 
 # 加载定时任务配置
 def load_schedule_config():
-    if os.path.exists(SCHEDULE_CONFIG_FILE):
-        with open(SCHEDULE_CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {'enabled': False, 'hour': 0, 'minute': 0}
+    try:
+        if os.path.exists(SCHEDULE_CONFIG_FILE) and os.path.isfile(SCHEDULE_CONFIG_FILE):
+            with open(SCHEDULE_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        return {'enabled': False, 'hour': 0, 'minute': 0}
+    except Exception as e:
+        print(f"加载定时任务配置文件失败: {e}")
+        return {'enabled': False, 'hour': 0, 'minute': 0}
 
 # 保存定时任务配置
 def save_schedule_config(config):
-    with open(SCHEDULE_CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
+    try:
+        with open(SCHEDULE_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"保存定时任务配置文件失败: {e}")
 
 # 加载密码配置
 def load_password_config():
-    if os.path.exists(PASSWORD_CONFIG_FILE):
-        with open(PASSWORD_CONFIG_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    # 默认无密码
-    return {'enabled': False, 'password_hash': ''}
+    try:
+        if os.path.exists(PASSWORD_CONFIG_FILE) and os.path.isfile(PASSWORD_CONFIG_FILE):
+            with open(PASSWORD_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        # 默认无密码
+        return {'enabled': False, 'password_hash': ''}
+    except Exception as e:
+        print(f"加载密码配置文件失败: {e}")
+        return {'enabled': False, 'password_hash': ''}
 
 # 保存密码配置
 def save_password_config(config):
-    with open(PASSWORD_CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
+    try:
+        with open(PASSWORD_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"保存密码配置文件失败: {e}")
 
 # 密码哈希函数
 def hash_password(password):
