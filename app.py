@@ -18,7 +18,7 @@ PASSWORD_CONFIG_FILE = 'password_config.json'
 def load_configs():
     try:
         if os.path.exists(CONFIG_FILE) and os.path.isfile(CONFIG_FILE):
-            with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(CONFIG_FILE, 'r', encoding='utf-8-sig') as f:
                 return json.load(f)
         return []
     except Exception as e:
@@ -37,7 +37,7 @@ def save_configs(configs):
 def load_notify_config():
     try:
         if os.path.exists(NOTIFY_CONFIG_FILE) and os.path.isfile(NOTIFY_CONFIG_FILE):
-            with open(NOTIFY_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(NOTIFY_CONFIG_FILE, 'r', encoding='utf-8-sig') as f:
                 return json.load(f)
         return {'tg_bot_token': '', 'tg_chat_id': ''}
     except Exception as e:
@@ -111,7 +111,7 @@ def check_schedule():
 def load_schedule_config():
     try:
         if os.path.exists(SCHEDULE_CONFIG_FILE) and os.path.isfile(SCHEDULE_CONFIG_FILE):
-            with open(SCHEDULE_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(SCHEDULE_CONFIG_FILE, 'r', encoding='utf-8-sig') as f:
                 return json.load(f)
         return {'enabled': False, 'hour': 0, 'minute': 0}
     except Exception as e:
@@ -130,7 +130,7 @@ def save_schedule_config(config):
 def load_password_config():
     try:
         if os.path.exists(PASSWORD_CONFIG_FILE) and os.path.isfile(PASSWORD_CONFIG_FILE):
-            with open(PASSWORD_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            with open(PASSWORD_CONFIG_FILE, 'r', encoding='utf-8-sig') as f:
                 return json.load(f)
         # 默认无密码
         return {'enabled': False, 'password_hash': ''}
