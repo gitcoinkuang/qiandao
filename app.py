@@ -303,7 +303,11 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
-    return redirect(url_for('login'))
+    password_config = load_password_config()
+    if password_config['enabled']:
+        return redirect(url_for('login'))
+    else:
+        return redirect(url_for('index'))
 
 @app.route('/')
 @login_required

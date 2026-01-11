@@ -422,7 +422,7 @@
                 <div class="tab" data-tab="notify">通知设置</div>
                 <div class="tab" data-tab="schedule">定时设置</div>
                 <div class="tab" data-tab="password">密码设置</div>
-                <div class="tab" data-tab="logout" style="margin-left: auto;">退出登录</div>
+                <div class="tab" data-tab="logout" id="logoutTab" style="margin-left: auto;">退出登录</div>
             </div>
             
             <div class="tab-content active" id="add">
@@ -656,7 +656,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadSigninList();
             initTabs();
+            checkPasswordConfig();
         });
+        
+        // 检查密码配置并显示/隐藏退出登录标签
+        function checkPasswordConfig() {
+            fetch('/password/config')
+                .then(response => response.json())
+                .then(config => {
+                    const logoutTab = document.getElementById('logoutTab');
+                    if (config.enabled) {
+                        logoutTab.style.display = 'block';
+                    } else {
+                        logoutTab.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('检查密码配置失败:', error);
+                });
+        }
         
         // 初始化标签页
         function initTabs() {
@@ -667,7 +685,17 @@
                     
                     // 处理退出登录
                     if (tabId === 'logout') {
-                        window.location.href = '/logout';
+                        // 检查密码是否启用
+                        fetch('/password/config')
+                            .then(response => response.json())
+                            .then(config => {
+                                if (config.enabled) {
+                                    window.location.href = '/logout';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('检查密码配置失败:', error);
+                            });
                         return;
                     }
                     
@@ -1169,6 +1197,8 @@
                     document.getElementById('passwordResult').textContent = '密码配置已保存！';
                     // 清空密码输入框
                     document.getElementById('passwordInput').value = '';
+                    // 重新检查密码配置并更新退出登录标签
+                    checkPasswordConfig();
                     // 如果启用了密码，跳转到登录页面
                     if (config.enabled) {
                         setTimeout(() => {
