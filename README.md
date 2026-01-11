@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 自动签到管理工具
 
 一个基于Flask的自动化签到管理系统，支持解析Curl命令、定时签到、Telegram通知等功能，采用黑客帝国风格UI。
@@ -168,6 +167,3 @@ docker logs signin-manager
 
 MIT License
 =======
-# qiandao
-傻瓜式的自动签到系统
->>>>>>> 2b66611153b79b2fc4405fbb20d0df4764823c1f
