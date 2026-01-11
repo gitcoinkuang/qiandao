@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  qiandao-app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./signin_configs.json:/app/signin_configs.json
+      - ./notify_config.json:/app/notify_config.json
+      - ./schedule_config.json:/app/schedule_config.json
+      - ./password_config.json:/app/password_config.json
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - FLASK_ENV=production
+      - FLASK_APP=app.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - qiandao-network
+
+networks:
+  qiandao-network:
+    driver: bridge
