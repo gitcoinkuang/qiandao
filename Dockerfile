@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . /app
 
 # 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # 暴露端口
 EXPOSE 5000
@@ -24,4 +24,4 @@ ENV FLASK_ENV=production
 ENV FLASK_APP=app.py
 
 # 运行应用
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
