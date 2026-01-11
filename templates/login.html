@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 - 自动签到管理工具</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
         
         * {
             margin: 0;
@@ -14,41 +14,55 @@
         }
         
         body {
-            font-family: 'Noto Sans SC', 'Noto Sans JP', sans-serif;
-            background-color: #f8f0ff;
-            color: #333;
+            font-family: 'Orbitron', monospace;
+            background-color: #000000;
+            color: #00ff00;
             line-height: 1.6;
             background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255, 182, 193, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(173, 216, 230, 0.1) 0%, transparent 50%),
-                linear-gradient(90deg, transparent 0%, rgba(221, 160, 221, 0.05) 50%, transparent 100%);
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(90deg, transparent 0%, rgba(0, 255, 0, 0.05) 50%, transparent 100%);
             background-attachment: fixed;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 数字雨效果 */
+        #matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
         }
         
         .login-container {
             width: 100%;
             max-width: 400px;
             padding: 40px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
             box-shadow: 
-                0 10px 30px rgba(255, 182, 193, 0.2),
-                0 0 0 1px rgba(221, 160, 221, 0.1);
-            border: 1px solid rgba(221, 160, 221, 0.2);
+                0 0 20px rgba(0, 255, 0, 0.3),
+                inset 0 0 30px rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            z-index: 1;
         }
         
         h1 {
             text-align: center;
-            color: #ff6b9d;
+            color: #00ff00;
             margin-bottom: 30px;
             font-size: 2em;
             text-shadow: 
-                0 2px 4px rgba(255, 182, 193, 0.5),
-                0 0 10px rgba(255, 182, 193, 0.3);
+                0 0 10px rgba(0, 255, 0, 0.7),
+                0 0 20px rgba(0, 255, 0, 0.5);
+            letter-spacing: 2px;
         }
         
         .form-group {
@@ -59,73 +73,89 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #6b5b95;
+            color: #00ff00;
             font-size: 1.1em;
         }
         
         input[type="password"] {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid rgba(173, 216, 230, 0.3);
-            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 6px;
             font-size: 14px;
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #333;
-            box-shadow: inset 0 2px 5px rgba(173, 216, 230, 0.1);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #00ff00;
+            font-family: 'Orbitron', monospace;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.1);
             transition: all 0.3s ease;
         }
         
         input[type="password"]:focus {
             outline: none;
-            border-color: #ff6b9d;
+            border-color: #00ff00;
             box-shadow: 
-                0 0 0 3px rgba(255, 107, 157, 0.1),
-                inset 0 2px 5px rgba(173, 216, 230, 0.1);
+                0 0 10px rgba(0, 255, 0, 0.5),
+                inset 0 0 10px rgba(0, 255, 0, 0.1);
         }
         
         .btn {
             display: block;
             width: 100%;
             padding: 12px 24px;
-            background-color: #ff6b9d;
-            color: white;
-            border: none;
-            border-radius: 25px;
+            background-color: #003300;
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
-            font-family: 'Noto Sans SC', sans-serif;
+            font-family: 'Orbitron', monospace;
             font-weight: 500;
             letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
             transition: all 0.3s ease;
             margin-top: 30px;
         }
         
         .btn:hover {
-            background-color: #ff528b;
-            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+            background-color: #004400;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
             transform: translateY(-2px);
         }
         
         .error-message {
-            background-color: rgba(255, 182, 193, 0.1);
-            color: #ff6b9d;
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
             padding: 12px;
-            border-radius: 10px;
+            border-radius: 6px;
             margin-bottom: 20px;
-            border: 2px solid rgba(255, 182, 193, 0.5);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
             text-align: center;
         }
         
         .footer {
             margin-top: 20px;
             text-align: center;
-            color: #6b5b95;
+            color: #00ff00;
             font-size: 14px;
+        }
+        
+        .footer a {
+            color: #00ff00;
+            text-decoration: none;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .footer a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.9);
         }
     </style>
 </head>
 <body>
+    <!-- 数字雨背景 -->
+    <canvas id="matrix-bg"></canvas>
+    
     <div class="login-container">
         <h1>自动签到管理工具</h1>
         {% if error %}
@@ -139,8 +169,49 @@
             <button type="submit" class="btn">登录</button>
         </form>
         <div class="footer">
-            © 2026 自动签到管理工具
+            © 2026 自动签到管理工具 | <a href="https://github.com/gitcoinkuang/qiandao" target="_blank">GitHub 项目地址</a>
         </div>
     </div>
+    
+    <script>
+        // 数字雨效果
+        window.onload = function() {
+            const canvas = document.getElementById('matrix-bg');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            const charSize = 14;
+            const columns = canvas.width / charSize;
+            
+            const drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ff00';
+                ctx.font = charSize + 'px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * charSize, drops[i] * charSize);
+                    
+                    if (drops[i] * charSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 33);
+        };
+    </script>
 </body>
 </html>
