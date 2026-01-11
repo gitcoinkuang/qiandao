@@ -891,16 +891,20 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    responseDiv.textContent = `成功: ${data.content}\n状态码: ${data.status_code}`;
-                    responseDiv.className = 'response success';
+                    // 成功时不显示内容
+                    responseDiv.style.display = 'none';
                 } else {
+                    // 失败时显示具体的失败信息
                     responseDiv.textContent = `失败: ${data.error}\n状态码: ${data.status_code || '未知'}`;
                     responseDiv.className = 'response error';
+                    responseDiv.style.display = 'block';
                 }
             })
             .catch(error => {
+                // 异常时显示错误信息
                 responseDiv.textContent = `失败: ${error.message}\n状态码: 未知`;
                 responseDiv.className = 'response error';
+                responseDiv.style.display = 'block';
             });
         }
         
@@ -917,10 +921,10 @@
                         const responseDiv = document.getElementById(`response-${result.index}`);
                         if (responseDiv) {
                             if (result.result.success) {
-                                responseDiv.textContent = `成功: ${result.result.content}\n状态码: ${result.result.status_code}`;
-                                responseDiv.className = 'response success';
-                                responseDiv.style.display = 'block';
+                                // 成功时不显示内容
+                                responseDiv.style.display = 'none';
                             } else {
+                                // 失败时显示具体的失败信息
                                 responseDiv.textContent = `失败: ${result.result.error}\n状态码: ${result.result.status_code || '未知'}`;
                                 responseDiv.className = 'response error';
                                 responseDiv.style.display = 'block';

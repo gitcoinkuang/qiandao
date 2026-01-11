@@ -170,6 +170,12 @@ def parse_curl(curl_command):
             key, value = header.split(': ', 1)
             config['headers'][key] = value
     
+    # 提取cookie
+    cookie_match = re.search(r"-b\s+'([^']+)'", curl_command)
+    if cookie_match:
+        cookie = cookie_match.group(1)
+        config['headers']['Cookie'] = cookie
+    
     # 提取data
     data_match = re.search(r"-d\s+'([^']+)'", curl_command)
     if data_match:
@@ -201,7 +207,8 @@ def run_signin(config):
             # 发送失败通知（状态码不是200）
             message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** HTTP {status_code}\n**详情:** 状态码不是200"
             send_telegram_notification(message)
-            return {'success': False, 'error': f'HTTP {status_code}', 'status_code': status_code, 'content': content}
+            error_detail = content[:100] + '...' if content else '无响应内容'
+            return {'success': False, 'error': f'HTTP {status_code} - {error_detail}', 'status_code': status_code, 'content': content}
         
         # 定义错误关键词列表（包括简体中文、繁体中文和英文）
         error_keywords = [
@@ -230,18 +237,20 @@ def run_signin(config):
             # 包含错误关键词且不包含成功关键词，视为失败
             message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**错误:** 返回数据中包含错误信息"
             send_telegram_notification(message)
-            return {'success': False, 'error': '返回数据中包含错误信息', 'status_code': status_code, 'content': content}
+            error_detail = content[:100] + '...' if content else '无响应内容'
+            return {'success': False, 'error': f'返回数据中包含错误信息 - {error_detail}', 'status_code': status_code, 'content': content}
         else:
             # 状态码200且不包含错误信息，视为成功
             message = f"✅ **签到成功**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**状态:** 成功"
             send_telegram_notification(message)
             return {'success': True, 'content': content, 'status_code': status_code}
     except requests.exceptions.HTTPError as e:
-        # 发送失败通知（HTTP错误）
-        status_code = e.response.status_code if e.response else None
-        message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** HTTP {status_code if status_code else '未知状态码'}\n**详情:** {str(e)}"
-        send_telegram_notification(message)
-        return {'success': False, 'error': str(e), 'status_code': status_code, 'content': e.response.text if e.response else ''}
+            # 发送失败通知（HTTP错误）
+            status_code = e.response.status_code if e.response else None
+            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** HTTP {status_code if status_code else '未知状态码'}\n**详情:** {str(e)}"
+            send_telegram_notification(message)
+            error_detail = e.response.text[:100] + '...' if e.response else '无响应内容'
+            return {'success': False, 'error': f'{str(e)} - {error_detail}', 'status_code': status_code, 'content': e.response.text if e.response else ''}
     except Exception as e:
         # 发送失败通知（其他错误）
         message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** {str(e)}"
@@ -458,4 +467,6 @@ if __name__ == '__main__':
     thread = threading.Thread(target=schedule_thread, daemon=True)
     thread.start()
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    import os
+    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
