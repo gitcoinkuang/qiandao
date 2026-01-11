@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 自动签到管理工具
 
 一个基于Flask的自动化签到管理系统，支持解析Curl命令、定时签到、Telegram通知等功能，采用黑客帝国风格UI。
@@ -42,28 +41,28 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/signin-manager.git
-cd signin-manager
+git clone https://github.com/gitcoinkuang/qiandao.git
+cd qiandao
 
 # 安装依赖
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ### 3. 启动服务
 
 ```bash
 # 开发模式
-python app.py
+python3 app.py
 
 # 生产模式 (使用Docker)
 docker-compose up -d
 ```
 
-服务将运行在 `http://localhost:5000`
+服务将运行在 `http://IP:5000`
 
 ### 4. 首次访问
 
-1. 打开浏览器访问 `http://localhost:5000`
+1. 打开浏览器访问 `http://IP:5000`
 2. 进入「密码设置」页面，设置访问密码
 3. 进入「通知设置」页面，配置Telegram Bot
 4. 进入「添加签到」页面，粘贴Curl命令并保存
@@ -115,18 +114,6 @@ signin-manager/
 
 ## Docker部署
 
-### 构建镜像
-
-```bash
-docker build -t signin-manager .
-```
-
-### 运行容器
-
-```bash
-docker run -d -p 5000:5000 --name signin-manager signin-manager
-```
-
 ### 使用Docker Compose
 
 ```bash
@@ -154,10 +141,10 @@ docker-compose up -d
 
 ```bash
 # 直接运行时
-python app.py
+python3 app.py
 
 # Docker运行时
-docker logs signin-manager
+docker-compose logs qiandao-app
 ```
 
 ## 贡献
@@ -168,6 +155,3 @@ docker logs signin-manager
 
 MIT License
 =======
-# qiandao
-傻瓜式的自动签到系统
->>>>>>> 2b66611153b79b2fc4405fbb20d0df4764823c1f
