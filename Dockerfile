@@ -1,10 +1,8 @@
 FROM python:3.9-slim
 
-# 安装系统依赖
+# 安装系统依赖（只需要gcc用于可能的依赖编译）
 RUN apt-get update && apt-get install -y \
     gcc \
-    libcurl4-openssl-dev \
-    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
@@ -14,7 +12,7 @@ WORKDIR /app
 COPY . /app
 
 # 安装Python依赖
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 暴露端口
 EXPOSE 5000
@@ -24,4 +22,4 @@ ENV FLASK_ENV=production
 ENV FLASK_APP=app.py
 
 # 运行应用
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]

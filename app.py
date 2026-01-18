@@ -3,16 +3,77 @@ import requests
 import json
 import re
 import os
-import hashlib
+import logging
+import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import secrets
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key'
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+csrf = CSRFProtect(app)
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 # 配置文件路径
 CONFIG_FILE = 'signin_configs.json'
 NOTIFY_CONFIG_FILE = 'notify_config.json'
 SCHEDULE_CONFIG_FILE = 'schedule_config.json'
 PASSWORD_CONFIG_FILE = 'password_config.json'
+HISTORY_FILE = 'signin_history.json'
+
+# 加载签到历史记录
+def load_history():
+    try:
+        if os.path.exists(HISTORY_FILE) and os.path.isfile(HISTORY_FILE):
+            with open(HISTORY_FILE, 'r', encoding='utf-8-sig') as f:
+                return json.load(f)
+        return []
+    except Exception as e:
+        logger.error(f"加载历史记录文件失败: {e}")
+        return []
+
+# 保存签到历史记录
+def save_history(history):
+    try:
+        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"保存历史记录文件失败: {e}")
+
+# 添加签到历史记录
+def add_history_record(config, result):
+    history = load_history()
+    record = {
+        'name': config.get('name', '未知'),
+        'url': config.get('url', ''),
+        'method': config.get('method', 'GET'),
+        'success': result.get('success', False),
+        'status_code': result.get('status_code'),
+        'error': result.get('error'),
+        'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    history.insert(0, record)
+    # 只保留最近100条记录
+    if len(history) > 100:
+        history = history[:100]
+    save_history(history)
 
 # 加载签到配置
 def load_configs():
@@ -22,7 +83,7 @@ def load_configs():
                 return json.load(f)
         return []
     except Exception as e:
-        print(f"加载配置文件失败: {e}")
+        logger.error(f"加载配置文件失败: {e}")
         return []
 
 # 保存签到配置
@@ -31,7 +92,7 @@ def save_configs(configs):
         with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
             json.dump(configs, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"保存签到配置文件失败: {e}")
+        logger.error(f"保存签到配置文件失败: {e}")
 
 # 加载通知配置
 def load_notify_config():
@@ -41,7 +102,7 @@ def load_notify_config():
                 return json.load(f)
         return {'tg_bot_token': '', 'tg_chat_id': ''}
     except Exception as e:
-        print(f"加载通知配置文件失败: {e}")
+        logger.error(f"加载通知配置文件失败: {e}")
         return {'tg_bot_token': '', 'tg_chat_id': ''}
 
 # 保存通知配置
@@ -50,7 +111,7 @@ def save_notify_config(config):
         with open(NOTIFY_CONFIG_FILE, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"保存通知配置文件失败: {e}")
+        logger.error(f"保存通知配置文件失败: {e}")
 
 # 发送Telegram通知
 def send_telegram_notification(message):
@@ -58,8 +119,10 @@ def send_telegram_notification(message):
     bot_token = notify_config.get('tg_bot_token')
     chat_id = notify_config.get('tg_chat_id')
     
-    if not bot_token or not chat_id:
-        return False
+    if not bot_token:
+        return {'success': False, 'error': 'Bot Token 未配置'}
+    if not chat_id:
+        return {'success': False, 'error': 'Chat ID 未配置'}
     
     try:
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -70,42 +133,70 @@ def send_telegram_notification(message):
         }
         response = requests.post(url, data=data, timeout=10)
         response.raise_for_status()
-        return True
+        return {'success': True}
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"发送TG通知HTTP错误: {e}")
+        # 解析Telegram API返回的错误信息
+        try:
+            error_data = response.json()
+            return {'success': False, 'error': f'Telegram API错误: {error_data.get("description", str(e))}'}
+        except:
+            return {'success': False, 'error': f'HTTP错误: {str(e)}'}
+    except requests.exceptions.ConnectionError:
+        logger.error("发送TG通知连接错误")
+        return {'success': False, 'error': '连接错误，请检查网络连接'}
+    except requests.exceptions.Timeout:
+        logger.error("发送TG通知超时")
+        return {'success': False, 'error': '请求超时，请检查网络连接'}
     except Exception as e:
-        print(f"发送TG通知失败: {e}")
-        return False
+        logger.error(f"发送TG通知失败: {e}")
+        return {'success': False, 'error': f'发送失败: {str(e)}'}
+
+# 记录上次执行时间（格式：YYYY-MM-DD HH:MM）
+last_execution_time = {}
 
 # 检查并执行定时任务
 def check_schedule():
     import datetime
     now = datetime.datetime.now()
-    current_hour = now.hour
-    current_minute = now.minute
+    current_time_str = now.strftime('%Y-%m-%d %H:%M')
     
     configs = load_configs()
     schedule_config = load_schedule_config()
     
     for config in configs:
+        task_name = config.get('name', '未知')
+        
         # 检查任务是否有单独的定时设置
         task_schedule = config.get('schedule', {})
         task_enabled = task_schedule.get('enabled', False)
+        
+        should_execute = False
         
         if task_enabled:
             # 使用任务单独的定时设置
             task_hour = task_schedule.get('hour', 0)
             task_minute = task_schedule.get('minute', 0)
             
-            if current_hour == task_hour and current_minute == task_minute:
-                print(f"执行定时任务: {config.get('name', '未知')}")
-                run_signin(config)
+            if now.hour == task_hour and now.minute == task_minute:
+                should_execute = True
         elif schedule_config.get('enabled', False):
             # 使用通用的定时设置
             global_hour = schedule_config.get('hour', 0)
             global_minute = schedule_config.get('minute', 0)
             
-            if current_hour == global_hour and current_minute == global_minute:
-                print(f"执行通用定时任务: {config.get('name', '未知')}")
-                run_signin(config)
+            if now.hour == global_hour and now.minute == global_minute:
+                should_execute = True
+        
+        if should_execute:
+            # 检查是否已经在当前分钟执行过
+            if last_execution_time.get(task_name) == current_time_str:
+                continue
+            
+            # 记录执行时间
+            last_execution_time[task_name] = current_time_str
+            logger.info(f"执行定时任务: {task_name}")
+            run_signin(config)
 
 # 加载定时任务配置
 def load_schedule_config():
@@ -115,7 +206,7 @@ def load_schedule_config():
                 return json.load(f)
         return {'enabled': False, 'hour': 0, 'minute': 0}
     except Exception as e:
-        print(f"加载定时任务配置文件失败: {e}")
+        logger.error(f"加载定时任务配置文件失败: {e}")
         return {'enabled': False, 'hour': 0, 'minute': 0}
 
 # 保存定时任务配置
@@ -124,7 +215,7 @@ def save_schedule_config(config):
         with open(SCHEDULE_CONFIG_FILE, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"保存定时任务配置文件失败: {e}")
+        logger.error(f"保存定时任务配置文件失败: {e}")
 
 # 加载密码配置
 def load_password_config():
@@ -135,7 +226,7 @@ def load_password_config():
         # 默认无密码
         return {'enabled': False, 'password_hash': ''}
     except Exception as e:
-        print(f"加载密码配置文件失败: {e}")
+        logger.error(f"加载密码配置文件失败: {e}")
         return {'enabled': False, 'password_hash': ''}
 
 # 保存密码配置
@@ -144,18 +235,16 @@ def save_password_config(config):
         with open(PASSWORD_CONFIG_FILE, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        print(f"保存密码配置文件失败: {e}")
-
-# 密码哈希函数
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+        logger.error(f"保存密码配置文件失败: {e}")
 
 # 密码验证函数
 def verify_password(password):
     config = load_password_config()
     if not config['enabled']:
-        return True  # 未启用密码验证
-    return hash_password(password) == config['password_hash']
+        return True
+    if not config.get('password_hash'):
+        return False
+    return check_password_hash(config['password_hash'], password)
 
 # 登录装饰器
 def login_required(f):
@@ -166,6 +255,30 @@ def login_required(f):
         return f(*args, **kwargs)
     decorated_function.__name__ = f.__name__
     return decorated_function
+
+# 输入验证函数
+def validate_url(url):
+    if not url or not isinstance(url, str):
+        return False
+    url = url.strip()
+    if not url.startswith(('http://', 'https://')):
+        return False
+    return True
+
+def validate_site_name(name):
+    if not name or not isinstance(name, str):
+        return False
+    name = name.strip()
+    if len(name) < 1 or len(name) > 100:
+        return False
+    return True
+
+def validate_password(password):
+    if not password or not isinstance(password, str):
+        return False
+    if len(password) < 6:
+        return False
+    return True
 
 # 解析Curl命令
 def parse_curl(curl_command):
@@ -213,6 +326,7 @@ def parse_curl(curl_command):
 
 # 运行签到
 def run_signin(config):
+    result = None
     try:
         method = config['method']
         url = config['url']
@@ -230,13 +344,24 @@ def run_signin(config):
         content = response.text
         status_code = response.status_code
         
+        # 准备返回内容预览（用于通知和日志）
+        content_preview = content[:150] + '...' if content else '无返回内容'
+        
+        # 记录签到开始日志
+        logger.info(f"开始签到: {config.get('name', '未知')} | URL: {url} | 方法: {method}")
+        
         # 检查HTTP状态码是否为200
         if status_code != 200:
             # 发送失败通知（状态码不是200）
-            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** HTTP {status_code}\n**详情:** 状态码不是200"
-            send_telegram_notification(message)
+            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**错误:** HTTP {status_code}\n**详情:** 状态码不是200\n\n**返回内容:**\n{content_preview}"
+            send_telegram_notification(message)  # 忽略返回结果，因为通知发送失败不影响签到结果
             error_detail = content[:100] + '...' if content else '无响应内容'
-            return {'success': False, 'error': f'HTTP {status_code} - {error_detail}', 'status_code': status_code, 'content': content}
+            result = {'success': False, 'error': f'HTTP {status_code} - {error_detail}', 'status_code': status_code, 'content': content or '无返回内容'}
+            # 记录签到失败日志
+            logger.error(f"签到失败: {config.get('name', '未知')} | 状态码: {status_code} | 错误: {error_detail}")
+            logger.debug(f"返回内容: {content_preview}")
+            add_history_record(config, result)
+            return result
         
         # 定义错误关键词列表（包括简体中文、繁体中文和英文）
         error_keywords = [
@@ -263,29 +388,52 @@ def run_signin(config):
         # 判断最终结果
         if has_error and not has_success:
             # 包含错误关键词且不包含成功关键词，视为失败
-            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**错误:** 返回数据中包含错误信息"
-            send_telegram_notification(message)
+            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**错误:** 返回数据中包含错误信息\n\n**返回内容:**\n{content_preview}"
+            send_telegram_notification(message)  # 忽略返回结果，因为通知发送失败不影响签到结果
             error_detail = content[:100] + '...' if content else '无响应内容'
-            return {'success': False, 'error': f'返回数据中包含错误信息 - {error_detail}', 'status_code': status_code, 'content': content}
+            result = {'success': False, 'error': f'返回数据中包含错误信息 - {error_detail}', 'status_code': status_code, 'content': content or '无返回内容'}
+            # 记录签到失败日志
+            logger.error(f"签到失败: {config.get('name', '未知')} | 状态码: {status_code} | 错误: 返回数据中包含错误信息")
+            logger.debug(f"返回内容: {content_preview}")
+            add_history_record(config, result)
+            return result
         else:
             # 状态码200且不包含错误信息，视为成功
-            message = f"✅ **签到成功**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**状态:** 成功"
-            send_telegram_notification(message)
-            return {'success': True, 'content': content, 'status_code': status_code}
+            message = f"✅ **签到成功**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code}\n**状态:** 成功\n\n**返回内容:**\n{content_preview}"
+            send_telegram_notification(message)  # 忽略返回结果，因为通知发送失败不影响签到结果
+            result = {'success': True, 'content': content or '无返回内容', 'status_code': status_code}
+            # 记录签到成功日志
+            logger.info(f"签到成功: {config.get('name', '未知')} | 状态码: {status_code}")
+            logger.debug(f"返回内容: {content_preview}")
+            add_history_record(config, result)
+            return result
     except requests.exceptions.HTTPError as e:
             # 发送失败通知（HTTP错误）
             status_code = e.response.status_code if e.response else None
-            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** HTTP {status_code if status_code else '未知状态码'}\n**详情:** {str(e)}"
-            send_telegram_notification(message)
-            error_detail = e.response.text[:100] + '...' if e.response else '无响应内容'
-            return {'success': False, 'error': f'{str(e)} - {error_detail}', 'status_code': status_code, 'content': e.response.text if e.response else ''}
+            response_text = e.response.text if e.response else ''
+            content_preview = response_text[:150] + '...' if response_text else '无返回内容'
+            message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**状态码:** {status_code if status_code else '未知状态码'}\n**错误:** HTTP错误 - {str(e)}\n\n**返回内容:**\n{content_preview}"
+            send_telegram_notification(message)  # 忽略返回结果，因为通知发送失败不影响签到结果
+            error_detail = response_text[:100] + '...' if response_text else '无响应内容'
+            result = {'success': False, 'error': f'{str(e)} - {error_detail}', 'status_code': status_code, 'content': response_text or '无返回内容'}
+            # 记录HTTP错误日志
+            logger.error(f"签到HTTP错误: {config.get('name', '未知')} | URL: {url} | 状态码: {status_code if status_code else '未知'} | 错误: {str(e)}")
+            logger.debug(f"返回内容: {content_preview}")
+            add_history_record(config, result)
+            return result
     except Exception as e:
         # 发送失败通知（其他错误）
-        message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** {str(e)}"
-        send_telegram_notification(message)
-        return {'success': False, 'error': str(e), 'status_code': None, 'content': ''}
+        message = f"❌ **签到失败**\n\n**网站:** {config.get('name', '未知')}\n**URL:** {url}\n**错误:** {str(e)}\n\n**返回内容:**\n无返回内容"
+        send_telegram_notification(message)  # 忽略返回结果，因为通知发送失败不影响签到结果
+        result = {'success': False, 'error': str(e), 'status_code': None, 'content': '无返回内容'}
+        # 记录其他异常日志
+        logger.error(f"签到异常: {config.get('name', '未知')} | URL: {url} | 错误: {str(e)}")
+        add_history_record(config, result)
+        return result
 
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("10 per minute")
+@csrf.exempt
 def login():
     if request.method == 'POST':
         password = request.form['password']
@@ -324,18 +472,40 @@ def index():
 
 @app.route('/parse', methods=['POST'])
 @login_required
+@csrf.exempt
 def parse():
-    curl_command = request.form['curl']
-    site_name = request.form['name']
-    request_method = request.form.get('method', 'GET')  # 获取用户选择的请求方法，默认为GET
+    curl_command = request.form.get('curl', '').strip()
+    site_name = request.form.get('name', '').strip()
+    request_method = request.form.get('method', 'GET')
     task_enabled = request.form.get('taskEnabled', 'false') == 'true'
     task_hour = int(request.form.get('taskHour', '8'))
     task_minute = int(request.form.get('taskMinute', '0'))
     
+    # 输入验证
+    if not curl_command:
+        return jsonify({'success': False, 'error': 'Curl命令不能为空'})
+    
+    if not validate_site_name(site_name):
+        return jsonify({'success': False, 'error': '网站名称不能为空且长度不能超过100个字符'})
+    
+    if request_method not in ['GET', 'POST']:
+        return jsonify({'success': False, 'error': '请求方法必须是GET或POST'})
+    
+    if not 0 <= task_hour <= 23:
+        return jsonify({'success': False, 'error': '小时必须在0-23之间'})
+    
+    if not 0 <= task_minute <= 59:
+        return jsonify({'success': False, 'error': '分钟必须在0-59之间'})
+    
     try:
         config = parse_curl(curl_command)
+        
+        # 验证解析出的URL
+        if not validate_url(config.get('url', '')):
+            return jsonify({'success': False, 'error': 'URL格式不正确'})
+        
         config['name'] = site_name
-        config['method'] = request_method  # 使用用户选择的请求方法
+        config['method'] = request_method
         config['schedule'] = {
             'enabled': task_enabled,
             'hour': task_hour,
@@ -343,10 +513,12 @@ def parse():
         }
         return jsonify({'success': True, 'config': config})
     except Exception as e:
+        logger.error(f"解析Curl命令失败: {e}")
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/save', methods=['POST'])
 @login_required
+@csrf.exempt
 def save():
     config = request.json
     configs = load_configs()
@@ -356,6 +528,7 @@ def save():
 
 @app.route('/run/<int:index>', methods=['POST'])
 @login_required
+@csrf.exempt
 def run(index):
     configs = load_configs()
     if 0 <= index < len(configs):
@@ -365,6 +538,7 @@ def run(index):
 
 @app.route('/run-all', methods=['POST'])
 @login_required
+@csrf.exempt
 def run_all():
     configs = load_configs()
     results = []
@@ -375,6 +549,7 @@ def run_all():
 
 @app.route('/delete/<int:index>', methods=['POST'])
 @login_required
+@csrf.exempt
 def delete(index):
     configs = load_configs()
     if 0 <= index < len(configs):
@@ -410,6 +585,7 @@ def edit(index):
 
 @app.route('/update/<int:index>', methods=['POST'])
 @login_required
+@csrf.exempt
 def update(index):
     config = request.json
     configs = load_configs()
@@ -427,6 +603,7 @@ def get_notify_config():
 
 @app.route('/notify/save', methods=['POST'])
 @login_required
+@csrf.exempt
 def save_notify_config_route():
     config = request.json
     save_notify_config(config)
@@ -434,9 +611,10 @@ def save_notify_config_route():
 
 @app.route('/notify/test', methods=['POST'])
 @login_required
+@csrf.exempt
 def test_notify():
-    success = send_telegram_notification("📢 **测试通知**\n\n这是一条测试消息，说明Telegram通知配置成功！")
-    return jsonify({'success': success})
+    result = send_telegram_notification("📢 **测试通知**\n\n这是一条测试消息，说明Telegram通知配置成功！")
+    return jsonify(result)
 
 @app.route('/schedule/config', methods=['GET'])
 @login_required
@@ -446,6 +624,7 @@ def get_schedule_config():
 
 @app.route('/schedule/save', methods=['POST'])
 @login_required
+@csrf.exempt
 def save_schedule_config_route():
     config = request.json
     save_schedule_config(config)
@@ -453,25 +632,43 @@ def save_schedule_config_route():
 
 @app.route('/schedule/check', methods=['POST'])
 @login_required
+@csrf.exempt
 def check_schedule_route():
     check_schedule()
     return jsonify({'success': True})
 
 # 密码配置路由
 @app.route('/password/config', methods=['GET'])
-@login_required
 def get_password_config():
     config = load_password_config()
     return jsonify(config)
 
 @app.route('/password/save', methods=['POST'])
-@login_required
+@csrf.exempt
 def save_password_config_route():
     config = request.json
+    if config is None:
+        return jsonify({'success': False, 'error': '请求格式无效'})
     if config.get('password'):
-        config['password_hash'] = hash_password(config['password'])
-        del config['password']  # 删除明文密码
+        password = config.get('password', '').strip()
+        if not validate_password(password):
+            return jsonify({'success': False, 'error': '密码长度至少为6个字符'})
+        config['password_hash'] = generate_password_hash(password)
+        del config['password']
     save_password_config(config)
+    return jsonify({'success': True})
+
+@app.route('/history', methods=['GET'])
+@login_required
+def get_history():
+    history = load_history()
+    return jsonify({'history': history})
+
+@app.route('/history/clear', methods=['POST'])
+@login_required
+@csrf.exempt
+def clear_history():
+    save_history([])
     return jsonify({'success': True})
 
 import threading

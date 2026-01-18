@@ -1,158 +1,136 @@
 # 自动签到管理工具
 
-一个基于Flask的自动签到管理工具，支持多网站自动签到、定时任务、Telegram通知等功能。
+一个基于 Flask 开发的自动签到管理工具，支持多网站签到、定时任务、Telegram 通知等功能。
 
 ## 功能特性
 
-- **Curl命令解析**：支持解析Curl命令并转换为可执行的签到任务
-- **多网站管理**：支持添加、编辑、删除多个网站的签到任务
-- **定时签到**：支持全局定时和每个任务单独设置定时
-- **Telegram通知**：签到结果通过Telegram机器人发送通知
-- **密码保护**：支持设置密码保护，防止未授权访问
-- **请求方法选择**：支持GET和POST请求方法
-- **详细错误信息**：失败时显示详细的错误信息，成功时不显示冗余信息
-- **黑客帝国风格UI**：具有数字雨效果的Matrix风格界面
-- **Docker部署**：支持使用Docker容器化部署
+- ✅ 支持通过 Curl 命令添加签到配置
+- ✅ 支持多网站同时管理
+- ✅ 支持手动运行单个或全部签到
+- ✅ 支持定时自动签到
+- ✅ 支持 Telegram 通知
+- ✅ 支持密码保护
+- ✅ 支持签到历史记录
+- ✅ 支持响应内容查看
+- ✅ 支持 Docker 部署
+- ✅ 支持日志记录
 
 ## 技术栈
 
 - **后端**：Flask 2.3.2
-- **前端**：HTML/CSS/JavaScript
-- **HTTP客户端**：requests 2.31.0
-- **容器化**：Docker
-- **通知**：Telegram Bot API
+- **HTTP 客户端**：requests 2.31.0
+- **安全保护**：Flask-WTF 1.2.1（CSRF 保护）
+- **速率限制**：flask-limiter 3.5.0
+- **部署方式**：Docker
 
 ## 安装部署
 
-### 方法一：直接运行
+### 直接运行
 
-1. **克隆项目**
-   ```bash
-   git clone https://github.com/gitcoinkuang/qiandao.git
-   cd qiandao
-   ```
+1. 克隆项目
+2. 安装依赖：`pip install -r requirements.txt`
+3. 运行应用：`python app.py`
+4. 访问：http://localhost:5000
 
-2. **安装依赖**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Docker 部署
 
-3. **运行项目**
-   ```bash
-   python app.py
-   ```
+1. 构建镜像：`docker build -t auto-signin .`
+2. 运行容器：`docker run -d -p 5000:5000 auto-signin`
+3. 访问：http://localhost:5000
 
-4. **访问应用**
-   打开浏览器访问 `http://localhost:5000`
+## 使用说明
 
-### 方法二：Docker部署
+### 1. 添加签到配置
 
-1. **克隆项目**
-   ```bash
-   git clone https://github.com/gitcoinkuang/qiandao.git
-   cd qiandao
-   ```
+1. 切换到「添加签到」标签页
+2. 输入 Curl 命令
+3. 输入网站名称
+4. 选择请求方法（GET/POST）
+5. 可选：设置定时签到
+6. 点击「解析 Curl」
+7. 点击「保存签到」
 
-2. **构建并运行容器**
-   ```bash
-   docker-compose up --build -d
-   ```
+### 2. 管理签到配置
 
-3. **访问应用**
-   打开浏览器访问 `http://localhost:5000`
+1. 切换到「管理签到」标签页
+2. 可以查看所有签到配置
+3. 支持手动运行单个签到
+4. 支持编辑和删除签到配置
+5. 支持运行全部签到
 
-## 使用方法
+### 3. 查看签到结果
 
-### 1. 添加签到任务
+- 手动运行签到后，会显示详细的返回内容
+- 可以查看状态码和返回内容预览
+- 成功信息会在 5 秒后自动隐藏
+- 失败信息会一直显示，直到手动刷新
 
-1. 在"添加签到"标签页中，粘贴Curl命令
-2. 输入网站名称
-3. 选择请求方法（GET/POST）
-4. 可选：设置定时任务
-5. 点击"解析Curl"按钮
-6. 点击"保存签到"按钮
+## 配置说明
 
-### 2. 管理签到任务
+### Telegram 通知设置
 
-1. 在"管理签到"标签页中，可以查看所有已添加的签到任务
-2. 点击"运行签到"按钮执行单个签到任务
-3. 点击"编辑"按钮修改现有签到任务
-4. 点击"删除"按钮删除不需要的签到任务
-5. 点击"运行全部签到"按钮执行所有签到任务
+1. 切换到「通知设置」标签页
+2. 输入 Bot Token（从 @BotFather 获取）
+3. 输入 Chat ID（从 @userinfobot 获取）
+4. 点击「保存配置」
+5. 点击「测试通知」验证配置
 
-### 3. 配置通知
+### 定时任务设置
 
-1. 在"通知设置"标签页中，输入Telegram Bot Token和Chat ID
-2. 点击"保存配置"按钮
-3. 点击"测试通知"按钮验证配置是否正确
+1. 切换到「定时设置」标签页
+2. 启用定时签到
+3. 设置签到时间（小时和分钟）
+4. 点击「保存配置」
 
-### 4. 配置定时任务
+### 密码保护设置
 
-1. 在"定时设置"标签页中，设置全局定时时间
-2. 点击"保存配置"按钮
-3. 或者在添加/编辑签到任务时，设置单个任务的定时时间
+1. 切换到「密码设置」标签页
+2. 启用密码保护
+3. 输入新密码（至少 6 个字符）
+4. 点击「保存配置」
+5. 保存后会自动跳转到登录页面
 
-### 5. 设置密码保护
+## 日志记录
 
-1. 在"密码设置"标签页中，启用密码保护
-2. 输入密码
-3. 点击"保存配置"按钮
-4. 下次访问时需要输入密码
+- 日志文件：`app.log`
+- 日志级别：INFO
+- 包含签到开始、成功、失败等信息
+- 包含返回内容预览
+- 包含 HTTP 状态码和错误信息
 
-## 配置文件
+## 历史记录
 
-项目使用以下配置文件：
+- 历史记录文件：`signin_history.json`
+- 保留最近 100 条记录
+- 包含签到时间、网站名称、URL、方法、结果、状态码等信息
 
-- `signin_configs.json`：签到任务配置
-- `notify_config.json`：Telegram通知配置
-- `schedule_config.json`：定时任务配置
-- `password_config.json`：密码保护配置
+## 开发说明
 
-## 常见问题
-
-### 1. Curl命令解析失败
-
-- 确保Curl命令格式正确
-- 确保包含完整的URL和必要的请求头
-
-### 2. 签到失败显示HTTP 403错误
-
-- 检查Curl命令中的Cookie信息是否正确
-- 检查请求头是否包含必要的信息（如User-Agent）
-
-### 3. Telegram通知不工作
-
-- 确保Bot Token正确
-- 确保Chat ID正确
-- 确保机器人已添加到聊天中并获得发送消息的权限
-
-### 4. 定时任务不执行
-
-- 确保定时时间设置正确
-- 确保应用程序持续运行
-
-## 项目结构
+### 项目结构
 
 ```
-qiandao/
-├── app.py                 # 主应用文件
-├── templates/
-│   ├── index.html         # 主页面
-│   └── login.html         # 登录页面
-├── requirements.txt       # 依赖项
-├── Dockerfile             # Docker构建文件
-├── docker-compose.yml     # Docker Compose配置
-└── README.md              # 项目说明
+.
+├── app.py              # 主应用文件
+├── requirements.txt     # 依赖列表
+├── Dockerfile          # Docker 构建文件
+├── .dockerignore       # Docker 忽略文件
+├── signin_history.json # 签到历史记录
+├── signin_configs.json # 签到配置
+├── notify_config.json  # 通知配置
+├── schedule_config.json # 定时任务配置
+├── password_config.json # 密码配置
+└── templates/          # 模板目录
+    └── index.html      # 主页面
 ```
 
-## 贡献
+### 主要功能模块
 
-欢迎提交Issue和Pull Request！
+1. **parse_curl**：解析 Curl 命令
+2. **run_signin**：执行签到
+3. **send_telegram_notification**：发送 Telegram 通知
+4. **check_schedule**：检查并执行定时任务
+5. **login_required**：登录验证装饰器
 
 ## 许可证
 
 MIT License
-
-## 项目地址
-
-[https://github.com/gitcoinkuang/qiandao](https://github.com/gitcoinkuang/qiandao)

@@ -1,0 +1,30 @@
+# 排除不必要的文件和目录
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# 排除开发工具和编辑器配置
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 排除测试文件和目录
+test_*.py
+__tests__/
+
+# 排除环境配置
+.env
+.env.local
+.env.*.local
+
+# 排除Docker相关文件（不排除Dockerfile本身）
+.dockerignore
+
+# 排除日志文件
+*.log
