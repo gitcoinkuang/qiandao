@@ -119,13 +119,16 @@
 ├── requirements.txt     # 依赖列表
 ├── Dockerfile          # Docker 构建文件
 ├── .dockerignore       # Docker 忽略文件
-├── signin_history.json # 签到历史记录
-├── signin_configs.json # 签到配置
-├── notify_config.json  # 通知配置
-├── schedule_config.json # 定时任务配置
-├── password_config.json # 密码配置
+├── app.log       # 日志文件
+└── config/          # 配置目录
+    └── signin_history.json # 签到历史记录
+    └── signin_configs.json # 签到配置
+    └── notify_config.json  # 通知配置
+    └── schedule_config.json # 定时任务配置
+    └── password_config.json # 密码配置
 └── templates/          # 模板目录
     └── index.html      # 主页面
+    └── login.html      # 登录页面
 ```
 
 ### 主要功能模块
