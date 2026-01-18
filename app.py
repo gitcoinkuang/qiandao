@@ -32,11 +32,11 @@ limiter = Limiter(
 )
 
 # 配置文件路径
-CONFIG_FILE = 'signin_configs.json'
-NOTIFY_CONFIG_FILE = 'notify_config.json'
-SCHEDULE_CONFIG_FILE = 'schedule_config.json'
-PASSWORD_CONFIG_FILE = 'password_config.json'
-HISTORY_FILE = 'signin_history.json'
+CONFIG_FILE = 'config/signin_configs.json'
+NOTIFY_CONFIG_FILE = 'config/notify_config.json'
+SCHEDULE_CONFIG_FILE = 'config/schedule_config.json'
+PASSWORD_CONFIG_FILE = 'config/password_config.json'
+HISTORY_FILE = 'config/signin_history.json'
 
 # 加载签到历史记录
 def load_history():
@@ -681,6 +681,10 @@ def schedule_thread():
         time.sleep(60)  # 每分钟检查一次
 
 if __name__ == '__main__':
+    # 确保config目录存在
+    if not os.path.exists('config'):
+        os.makedirs('config')
+    
     # 确保templates目录存在
     if not os.path.exists('templates'):
         os.makedirs('templates')
