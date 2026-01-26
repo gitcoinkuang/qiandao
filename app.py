@@ -31,12 +31,14 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
-# 配置文件路径
-CONFIG_FILE = 'config/signin_configs.json'
-NOTIFY_CONFIG_FILE = 'config/notify_config.json'
-SCHEDULE_CONFIG_FILE = 'config/schedule_config.json'
-PASSWORD_CONFIG_FILE = 'config/password_config.json'
-HISTORY_FILE = 'config/signin_history.json'
+# 配置文件路径（使用绝对路径，确保在后台线程中也能正确加载）
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_FILE = os.path.join(BASE_DIR, 'config', 'signin_configs.json')
+NOTIFY_CONFIG_FILE = os.path.join(BASE_DIR, 'config', 'notify_config.json')
+SCHEDULE_CONFIG_FILE = os.path.join(BASE_DIR, 'config', 'schedule_config.json')
+PASSWORD_CONFIG_FILE = os.path.join(BASE_DIR, 'config', 'password_config.json')
+HISTORY_FILE = os.path.join(BASE_DIR, 'config', 'signin_history.json')
 
 # 加载签到历史记录
 def load_history():
