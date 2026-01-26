@@ -28,15 +28,20 @@
 ### 直接运行
 
 1. 克隆项目
-2. 安装依赖：`pip install -r requirements.txt`
-3. 运行应用：`python app.py`
-4. 访问：http://localhost:5000
+2. 安装依赖：`pip3 install -r requirements.txt`
+3. 运行应用：`python3 app.py`
+4. 访问：http://ip:5000
 
 ### Docker 部署
 
-1. 构建镜像：`docker build -t auto-signin .`
-2. 运行容器：`docker run -d -p 5000:5000 auto-signin`
-3. 访问：http://localhost:5000
+1. 构建镜像：`docker build -t qiandao-app .`
+2. 运行容器：`docker run -d -p 5000:5000 qiandao-app`
+3. 访问：http://ip:5000
+
+### Docker-Compose 部署
+
+1. 运行容器：`docker-compose up -d`
+2. 访问：http://ip:5000
 
 ## 使用说明
 
@@ -114,13 +119,16 @@
 ├── requirements.txt     # 依赖列表
 ├── Dockerfile          # Docker 构建文件
 ├── .dockerignore       # Docker 忽略文件
-├── signin_history.json # 签到历史记录
-├── signin_configs.json # 签到配置
-├── notify_config.json  # 通知配置
-├── schedule_config.json # 定时任务配置
-├── password_config.json # 密码配置
+├── app.log       # 日志文件
+└── config/          # 配置目录
+    └── signin_history.json # 签到历史记录
+    └── signin_configs.json # 签到配置
+    └── notify_config.json  # 通知配置
+    └── schedule_config.json # 定时任务配置
+    └── password_config.json # 密码配置
 └── templates/          # 模板目录
     └── index.html      # 主页面
+    └── login.html      # 登录页面
 ```
 
 ### 主要功能模块
