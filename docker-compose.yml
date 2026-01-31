@@ -7,7 +7,7 @@ services:
       - "5000:5000"
     volumes:
       - ./config:/app/config  # 映射config目录
-      - ./app.log:/app/app.log  # 映射日志文件
+      - ./logs:/app/logs  # 映射日志目录
     restart: always
     environment:
       - TZ=Asia/Shanghai

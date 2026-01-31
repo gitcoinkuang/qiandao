@@ -97,7 +97,7 @@
 
 ## 日志记录
 
-- 日志文件：`app.log`
+- 日志文件：`logs/app.log`
 - 日志级别：INFO
 - 包含签到开始、成功、失败等信息
 - 包含返回内容预览
@@ -119,7 +119,8 @@
 ├── requirements.txt     # 依赖列表
 ├── Dockerfile          # Docker 构建文件
 ├── .dockerignore       # Docker 忽略文件
-├── app.log       # 日志文件
+├── logs/               # 日志目录
+    └── app.log       # 日志文件
 └── config/          # 配置目录
     └── signin_history.json # 签到历史记录
     └── signin_configs.json # 签到配置

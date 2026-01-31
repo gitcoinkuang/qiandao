@@ -11,11 +11,16 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import secrets
 
+# 确保logs目录存在
+import os
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('app.log', encoding='utf-8'),
+        logging.FileHandler('logs/app.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
