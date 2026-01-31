@@ -6,7 +6,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./config:/app/config  # 只映射config目录，不覆盖整个/app
+      - ./config:/app/config  # 映射config目录
+      - ./app.log:/app/app.log  # 映射日志文件
     restart: always
     environment:
       - TZ=Asia/Shanghai
