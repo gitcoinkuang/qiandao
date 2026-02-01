@@ -150,9 +150,27 @@ def send_telegram_notification(message):
             logger.error(f"Telegram API错误详情: {error_description}")
             logger.debug(f"发送的消息内容: {message[:200]}..." if len(message) > 200 else f"发送的消息内容: {message}")
             
-            # 如果是Markdown格式错误，尝试使用纯文本格式重新发送
-            if "parse_mode" in error_description.lower() or "markdown" in error_description.lower():
+            # 如果是Markdown格式错误或实体解析错误，尝试使用纯文本格式重新发送
+            if any(keyword in error_description.lower() for keyword in ["parse_mode", "markdown", "entities", "entity"]):
                 logger.info("尝试使用纯文本格式重新发送通知")
+                data = {
+                    'chat_id': chat_id,
+                    'text': message
+                }
+                try:
+                    response = requests.post(url, data=data, timeout=10)
+                    response.raise_for_status()
+                    return {'success': True}
+                except Exception as text_error:
+                    logger.error(f"使用纯文本格式发送通知失败: {text_error}")
+                    return {'success': False, 'error': f'纯文本发送失败: {str(text_error)}'}
+            
+            return {'success': False, 'error': f'Telegram API错误: {error_description}'}
+        except Exception as parse_error:
+            logger.error(f"解析TG错误信息失败: {parse_error}")
+            # 即使解析错误，也尝试使用纯文本格式重新发送
+            logger.info("解析错误，尝试使用纯文本格式重新发送通知")
+            try:
                 data = {
                     'chat_id': chat_id,
                     'text': message
@@ -160,11 +178,9 @@ def send_telegram_notification(message):
                 response = requests.post(url, data=data, timeout=10)
                 response.raise_for_status()
                 return {'success': True}
-            
-            return {'success': False, 'error': f'Telegram API错误: {error_description}'}
-        except Exception as parse_error:
-            logger.error(f"解析TG错误信息失败: {parse_error}")
-            return {'success': False, 'error': f'HTTP错误: {str(e)}'}
+            except Exception as text_error:
+                logger.error(f"使用纯文本格式发送通知失败: {text_error}")
+                return {'success': False, 'error': f'HTTP错误: {str(e)}'}
     except requests.exceptions.ConnectionError:
         logger.error("发送TG通知连接错误")
         return {'success': False, 'error': '连接错误，请检查网络连接'}
