@@ -624,6 +624,7 @@
             <div class="tabs">
                 <div class="tab active" data-tab="add">添加签到</div>
                 <div class="tab" data-tab="manage">管理签到</div>
+                <div class="tab" data-tab="history">签到历史</div>
                 <div class="tab" data-tab="notify">通知设置</div>
                 <div class="tab" data-tab="schedule">定时设置</div>
                 <div class="tab" data-tab="password">密码设置</div>
@@ -748,6 +749,30 @@
                         <li>确保服务器在指定时间处于运行状态</li>
                         <li>定时任务依赖于服务器时间</li>
                         <li>保存配置后立即生效</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="history">
+                <div class="section">
+                    <h2>签到历史记录</h2>
+                    <button class="btn" onclick="loadHistory()">刷新历史</button>
+                    <button class="btn btn-danger" onclick="clearHistory()">清空历史</button>
+                    <div id="historyList" class="signin-list" style="margin-top: 20px;"></div>
+                </div>
+                <div class="section">
+                    <h2>历史记录说明</h2>
+                    <p>1. 记录内容：</p>
+                    <ul>
+                        <li>包含所有签到任务的运行记录</li>
+                        <li>显示任务名称、URL、方法、结果、状态码等信息</li>
+                        <li>记录签到时间</li>
+                    </ul>
+                    <p>2. 注意事项：</p>
+                    <ul>
+                        <li>系统自动保留最近100条记录</li>
+                        <li>清空历史后无法恢复</li>
+                        <li>手动运行和定时运行的记录都会显示</li>
                     </ul>
                 </div>
             </div>
@@ -891,9 +916,75 @@
                         loadScheduleConfig();
                     } else if (tabId === 'password') {
                         loadPasswordConfig();
+                    } else if (tabId === 'history') {
+                        loadHistory();
                     }
                 });
             });
+        }
+        
+        // 加载签到历史记录
+        function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '<p>加载中...</p>';
+            
+            // 从后端获取历史记录
+            fetch('/history')
+            .then(response => response.json())
+            .then(data => {
+                const history = data.history || [];
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p>暂无签到历史记录</p>';
+                    return;
+                }
+                
+                history.forEach(record => {
+                    const item = document.createElement('div');
+                    item.className = 'signin-item';
+                    
+                    // 根据结果设置样式
+                    const resultClass = record.success ? 'success' : 'error';
+                    const resultIcon = record.success ? '✅' : '❌';
+                    const resultText = record.success ? '成功' : '失败';
+                    
+                    item.innerHTML = `
+                        <h3>${resultIcon} ${record.name}</h3>
+                        <p><strong>时间:</strong> ${record.timestamp}</p>
+                        <p><strong>URL:</strong> ${record.url}</p>
+                        <p><strong>方法:</strong> ${record.method}</p>
+                        <p><strong>结果:</strong> <span class="${resultClass}">${resultText}</span></p>
+                        ${record.status_code ? `<p><strong>状态码:</strong> ${record.status_code}</p>` : ''}
+                        ${record.error ? `<p><strong>错误:</strong> ${escapeHtml(record.error)}</p>` : ''}
+                    `;
+                    historyList.appendChild(item);
+                });
+            })
+            .catch(error => {
+                historyList.innerHTML = '<p>加载失败：' + error.message + '</p>';
+            });
+        }
+        
+        // 清空签到历史记录
+        function clearHistory() {
+            if (confirm('确定要清空所有签到历史记录吗？此操作不可恢复。')) {
+                fetch('/history/clear', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('历史记录已清空', 'success');
+                        loadHistory();
+                    } else {
+                        showMessage('清空失败：' + (data.error || '未知错误'), 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('清空失败：' + error.message, 'error');
+                });
+            }
         }
         
         // 解析Curl命令
