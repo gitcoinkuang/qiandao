@@ -146,8 +146,24 @@ def send_telegram_notification(message):
         # 解析Telegram API返回的错误信息
         try:
             error_data = response.json()
-            return {'success': False, 'error': f'Telegram API错误: {error_data.get("description", str(e))}'}
-        except:
+            error_description = error_data.get("description", str(e))
+            logger.error(f"Telegram API错误详情: {error_description}")
+            logger.debug(f"发送的消息内容: {message[:200]}..." if len(message) > 200 else f"发送的消息内容: {message}")
+            
+            # 如果是Markdown格式错误，尝试使用纯文本格式重新发送
+            if "parse_mode" in error_description.lower() or "markdown" in error_description.lower():
+                logger.info("尝试使用纯文本格式重新发送通知")
+                data = {
+                    'chat_id': chat_id,
+                    'text': message
+                }
+                response = requests.post(url, data=data, timeout=10)
+                response.raise_for_status()
+                return {'success': True}
+            
+            return {'success': False, 'error': f'Telegram API错误: {error_description}'}
+        except Exception as parse_error:
+            logger.error(f"解析TG错误信息失败: {parse_error}")
             return {'success': False, 'error': f'HTTP错误: {str(e)}'}
     except requests.exceptions.ConnectionError:
         logger.error("发送TG通知连接错误")
@@ -157,6 +173,7 @@ def send_telegram_notification(message):
         return {'success': False, 'error': '请求超时，请检查网络连接'}
     except Exception as e:
         logger.error(f"发送TG通知失败: {e}")
+        logger.debug(f"发送的消息内容: {message[:200]}..." if len(message) > 200 else f"发送的消息内容: {message}")
         return {'success': False, 'error': f'发送失败: {str(e)}'}
 
 # 记录上次执行时间（格式：YYYY-MM-DD HH:MM）
