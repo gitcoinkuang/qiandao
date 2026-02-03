@@ -950,28 +950,26 @@
                     const resultIcon = record.success ? '✅' : '❌';
                     const resultText = record.success ? '成功' : '失败';
                     
-                    // 检查是否需要展开/收起功能
-                    const hasLongContent = (record.error && record.error.length > 100) || 
-                                         (record.url && record.url.length > 100);
-                    
                     item.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3>${resultIcon} ${record.name}</h3>
-                            ${hasLongContent ? `<button class="btn btn-secondary" onclick="toggleHistoryDetails(${index})" style="font-size: 12px; padding: 6px 12px;">查看详情</button>` : ''}
-                        </div>
+                        <h3>${resultIcon} ${record.name}</h3>
                         <p><strong>时间:</strong> ${record.timestamp}</p>
                         <p><strong>URL:</strong> ${record.url.length > 100 ? record.url.substring(0, 100) + '...' : record.url}</p>
                         <p><strong>方法:</strong> ${record.method}</p>
                         <p><strong>结果:</strong> <span class="${resultClass}">${resultText}</span></p>
                         ${record.status_code ? `<p><strong>状态码:</strong> ${record.status_code}</p>` : ''}
                         ${record.error ? `<p><strong>错误:</strong> ${record.error.length > 100 ? record.error.substring(0, 100) + '...' : escapeHtml(record.error)}</p>` : ''}
-                        ${hasLongContent ? `
-                            <div id="history-details-${index}" style="display: none; margin-top: 15px; padding: 15px; background-color: var(--bg-tertiary); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                                <h4>详细信息</h4>
-                                <p><strong>完整URL:</strong> ${record.url}</p>
-                                ${record.error ? `<p><strong>完整错误信息:</strong> ${escapeHtml(record.error)}</p>` : ''}
-                            </div>
-                        ` : ''}
+                        <div id="history-details-${index}" style="display: none; margin-top: 15px; padding: 15px; background-color: var(--bg-tertiary); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                            <h4>详细信息</h4>
+                            <p><strong>完整URL:</strong> ${record.url}</p>
+                            ${record.error ? `<p><strong>完整错误信息:</strong> ${escapeHtml(record.error)}</p>` : ''}
+                            ${record.content ? `
+                                <p><strong>完整返回内容:</strong></p>
+                                <pre style="white-space: pre-wrap; font-size: 12px; margin: 10px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 300px; overflow-y: auto;">${escapeHtml(record.content)}</pre>
+                            ` : ''}
+                        </div>
+                        <div style="margin-top: 10px; text-align: right;">
+                            <button class="btn btn-secondary" onclick="toggleHistoryDetails(${index})" style="font-size: 12px; padding: 6px 12px;">查看详情</button>
+                        </div>
                     `;
                     historyList.appendChild(item);
                 });

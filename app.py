@@ -74,6 +74,7 @@ def add_history_record(config, result):
         'success': result.get('success', False),
         'status_code': result.get('status_code'),
         'error': result.get('error'),
+        'content': result.get('content'),
         'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     history.insert(0, record)
