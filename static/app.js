@@ -4,6 +4,7 @@ let state = {
     editingId: null,
     taskFilter: "all",
     taskSearch: "",
+    currentView: "overview",
 };
 
 const TEXT = {
@@ -63,6 +64,30 @@ const TEXT = {
 
 const $ = (id) => document.getElementById(id);
 const messageEl = $("message");
+
+function setView(view) {
+    state.currentView = view;
+
+    const views = {
+        overview: $("overviewView"),
+        tasks: $("tasksView"),
+        settings: $("settingsView"),
+    };
+
+    const buttons = {
+        overview: $("navOverviewBtn"),
+        tasks: $("navTasksBtn"),
+        settings: $("navSettingsBtn"),
+    };
+
+    Object.entries(views).forEach(([key, element]) => {
+        element.classList.toggle("hidden", key !== view);
+    });
+
+    Object.entries(buttons).forEach(([key, element]) => {
+        element.classList.toggle("nav-button-active", key === view);
+    });
+}
 
 async function api(url, options = {}) {
     const response = await fetch(url, {
@@ -336,6 +361,7 @@ function editTask(id) {
     const task = state.tasks.find((item) => item.id === id);
     if (!task) return;
 
+    setView("tasks");
     state.editingId = id;
     $("taskFormTitle").textContent = `${TEXT.editTaskPrefix}${id}`;
     $("taskName").value = task.name;
@@ -474,9 +500,15 @@ function bindTaskSearch() {
 }
 
 function attachEvents() {
+    $("navOverviewBtn").addEventListener("click", () => setView("overview"));
+    $("navTasksBtn").addEventListener("click", () => setView("tasks"));
+    $("navSettingsBtn").addEventListener("click", () => setView("settings"));
     $("runAllBtn").addEventListener("click", () => runAllTasks().catch(handleError));
     $("refreshBtn").addEventListener("click", () => loadBootstrap().catch(handleError));
-    $("newTaskBtn").addEventListener("click", () => resetTask());
+    $("newTaskBtn").addEventListener("click", () => {
+        setView("tasks");
+        resetTask();
+    });
     $("parseCurlBtn").addEventListener("click", () => parseCurl().catch(handleError));
     $("saveTaskBtn").addEventListener("click", () => saveTask().catch(handleError));
     $("resetTaskBtn").addEventListener("click", () => resetTask());
@@ -494,4 +526,5 @@ function handleError(error) {
 }
 
 attachEvents();
+setView("overview");
 loadBootstrap().catch(handleError);
