@@ -278,8 +278,7 @@ p,
 }
 
 .compact-panel {
-    position: sticky;
-    top: 24px;
+    align-self: start;
 }
 
 .section-head {
@@ -425,9 +424,28 @@ p,
     gap: 8px;
 }
 
+.field-head,
+.preview-head,
+.task-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
 .field span {
     font-size: 13px;
     font-weight: 700;
+}
+
+.field-head > span {
+    color: var(--muted);
+}
+
+.inline-action {
+    padding: 8px 12px;
+    font-size: 13px;
+    box-shadow: none;
 }
 
 .span-2 {
@@ -474,6 +492,27 @@ textarea {
     overflow: auto;
 }
 
+.preview {
+    max-height: 220px;
+    margin-top: 12px;
+}
+
+.preview-card {
+    margin-top: 16px;
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    background: #f8fbff;
+    border: 1px solid rgba(57, 82, 122, 0.08);
+}
+
+.preview-head strong {
+    font-size: 14px;
+}
+
+.preview-head .meta {
+    font-size: 12px;
+}
+
 .health-row {
     display: grid;
     gap: 8px;
@@ -513,6 +552,11 @@ textarea {
 .feed-item strong {
     display: block;
     margin-bottom: 6px;
+}
+
+.task-actions {
+    margin-top: 14px;
+    justify-content: flex-start;
 }
 
 .login-body {
@@ -571,6 +615,12 @@ textarea {
     .summary-grid,
     .form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .field-head,
+    .preview-head {
+        flex-direction: column;
+        align-items: flex-start;
     }
 
     .span-2 {

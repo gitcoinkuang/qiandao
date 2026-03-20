@@ -63,7 +63,6 @@
                             <h2>&#x4EFB;&#x52A1;&#x4E2D;&#x5FC3;</h2>
                             <p>&#x5728;&#x8FD9;&#x91CC;&#x5FEB;&#x901F;&#x7B5B;&#x9009;&#x3001;&#x68C0;&#x7D22;&#x3001;&#x8FD0;&#x884C;&#x548C;&#x7F16;&#x8F91;&#x4EFB;&#x52A1;&#x3002;</p>
                         </div>
-                        <button class="primary" id="parseCurlBtn">&#x89E3;&#x6790; Curl</button>
                     </div>
 
                     <div class="toolbar">
@@ -130,7 +129,10 @@
                             </select>
                         </label>
                         <label class="field span-2">
-                            <span>Curl &#x547D;&#x4EE4;</span>
+                            <span class="field-head">
+                                <span>Curl &#x547D;&#x4EE4;</span>
+                                <button class="secondary inline-action" type="button" id="parseCurlBtn">&#x89E3;&#x6790; Curl</button>
+                            </span>
                             <textarea id="taskCurl" placeholder="&#x7C98;&#x8D34;&#x5B8C;&#x6574;&#x7684; curl &#x547D;&#x4EE4;"></textarea>
                         </label>
                         <label class="field span-2">
@@ -181,10 +183,16 @@
                         <button class="ghost" id="resetTaskBtn">&#x91CD;&#x7F6E;&#x8868;&#x5355;</button>
                     </div>
 
-                    <pre id="taskPreview" class="preview">&#x8FD9;&#x91CC;&#x4F1A;&#x663E;&#x793A;&#x89E3;&#x6790;&#x7ED3;&#x679C;&#x6216;&#x5F53;&#x524D;&#x4EFB;&#x52A1;&#x7684;&#x8BE6;&#x7EC6;&#x4FE1;&#x606F;&#x3002;</pre>
+                    <div class="preview-card">
+                        <div class="preview-head">
+                            <strong>&#x9884;&#x89C8;&#x7ED3;&#x679C;</strong>
+                            <span class="meta">&#x89E3;&#x6790;&#x540E;&#x5728;&#x8FD9;&#x91CC;&#x67E5;&#x770B;&#x8BF7;&#x6C42;&#x7ED3;&#x6784;</span>
+                        </div>
+                        <pre id="taskPreview" class="preview">&#x8FD9;&#x91CC;&#x4F1A;&#x663E;&#x793A;&#x89E3;&#x6790;&#x7ED3;&#x679C;&#x6216;&#x5F53;&#x524D;&#x4EFB;&#x52A1;&#x7684;&#x8BE6;&#x7EC6;&#x4FE1;&#x606F;&#x3002;</pre>
+                    </div>
                 </section>
 
-                <section class="panel compact-panel">
+                <section class="panel">
                     <div class="section-head">
                         <div>
                             <h2>&#x8C03;&#x5EA6;&#x4E0E;&#x901A;&#x77E5;</h2>
