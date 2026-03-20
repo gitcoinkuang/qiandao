@@ -1,1569 +1,214 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自动签到管理工具</title>
-    <style>
-        /* 现代化CSS设计 */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        /* CSS变量定义 */
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8fafc;
-            --bg-tertiary: #f1f5f9;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --border-color: #e2e8f0;
-            --border-radius: 12px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --transition: all 0.3s ease;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        /* 移除数字雨效果 */
-        #matrix-bg {
-            display: none;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 30px;
-            background-color: var(--bg-primary);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
-        }
-        
-        h1 {
-            text-align: center;
-            color: var(--text-primary);
-            margin-bottom: 40px;
-            font-size: 2.5em;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-        }
-        
-        h2 {
-            color: var(--text-primary);
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            font-weight: 600;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-        
-        h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        
-        .section {
-            margin-bottom: 30px;
-            padding: 25px;
-            background-color: var(--bg-primary);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--text-primary);
-            font-size: 0.875em;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        textarea {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            resize: vertical;
-            min-height: 180px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-        
-        textarea:focus, input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        input[type="text"], input[type="number"], input[type="password"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-        
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 10px;
-            accent-color: var(--primary-color);
-        }
-        
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: var(--transition);
-            cursor: pointer;
-        }
-        
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 24px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 14px;
-            margin-right: 15px;
-            margin-bottom: 15px;
-            font-weight: 500;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .btn:hover {
-            background-color: var(--primary-hover);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-        
-        .btn-success {
-            background-color: var(--success-color);
-        }
-        
-        .btn-success:hover {
-            background-color: #059669;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
-        
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: var(--bg-tertiary);
-            border-radius: var(--border-radius);
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
-            font-size: 13px;
-        }
-        
-        .signin-list {
-            margin-top: 20px;
-        }
-        
-        .signin-item {
-            padding: 25px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            background-color: var(--bg-primary);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-        
-        .signin-item:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-        
-        .signin-item h3 {
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        
-        .signin-item p {
-            margin-bottom: 12px;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        .signin-item .actions {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .response {
-            margin-top: 15px;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            border: 1px solid transparent;
-        }
-        
-        .response.success {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-        
-        .response.error {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-        
-        .tab-container {
-            margin-bottom: 30px;
-        }
-        
-        .tabs {
-            display: flex;
-            background-color: var(--bg-primary);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            border-bottom: none;
-            overflow-x: auto;
-            padding: 0 20px;
-            gap: 5px;
-        }
-        
-        .tab {
-            padding: 16px 24px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-        
-        .tab:hover {
-            color: var(--primary-color);
-        }
-        
-        .tab.active {
-            border-bottom-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        .tab-content {
-            display: none;
-            background-color: var(--bg-primary);
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .message {
-            padding: 16px 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            font-weight: 500;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .message.success {
-            background-color: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        
-        .message.error {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
-        .message.warning {
-            background-color: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        
-        ul {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-        
-        li {
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
-        
-        code {
-            background-color: var(--bg-tertiary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px auto;
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .section {
-                padding: 20px;
-            }
-            
-            .btn {
-                display: flex;
-                width: 100%;
-                margin-right: 0;
-            }
-            
-            .tabs {
-                flex-direction: column;
-                padding: 0;
-            }
-            
-            .tab {
-                border-bottom: 1px solid var(--border-color);
-                border-radius: 0;
-            }
-            
-            .tab:last-child {
-                border-bottom: none;
-            }
-            
-            .tab.active {
-                border-bottom-color: var(--primary-color);
-            }
-            
-            .signin-item .actions {
-                flex-direction: column;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
-        }
-        
-        /* 版权信息 */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-            font-size: 14px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-        
-        .footer a:hover {
-            color: var(--primary-hover);
-            text-decoration: underline;
-        }
-        
-        /* 平滑滚动 */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* 表单元素焦点状态 */
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-        
-        /* 标签页动画 */
-        .tab-content {
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        
-        /* 按钮组 */
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        /* 帮助文本 */
-        .help-text {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-        
-        /* 现代化表单样式 */
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            transition: all 0.2s ease;
-        }
-        
-        /* 卡片悬停效果 */
-        .section {
-            transition: all 0.3s ease;
-        }
-        
-        .section:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-1px);
-        }
-        
-        /* 标题样式优化 */
-        h2 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* 响应式网格布局 */
-        @media (min-width: 768px) {
-            .grid {
-                display: grid;
-                gap: 1.5rem;
-            }
-            
-            .grid-cols-1 {
-                grid-template-columns: repeat(1, minmax(0, 1fr));
-            }
-            
-            .grid-cols-2 {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-            
-            .grid-cols-3 {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-        }
-        
-        /* 弹性布局工具类 */
-        .flex {
-            display: flex;
-        }
-        
-        .items-center {
-            align-items: center;
-        }
-        
-        .justify-between {
-            justify-content: space-between;
-        }
-        
-        .mb-4 {
-            margin-bottom: 1rem;
-        }
-        
-        .mt-4 {
-            margin-top: 1rem;
-        }
-        
-        .mt-6 {
-            margin-top: 1.5rem;
-        }
-        
-        /* 间距工具类 */
-        .gap-4 {
-            gap: 1rem;
-        }
-        
-        /* 响应式设计优化 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .section {
-                padding: 20px;
-            }
-        }
-        
-        /* 平滑过渡效果 */
-        * {
-            transition: all 0.2s ease;
-        }
-        
-        /* 现代化滚动条 */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-color);
-        }
-        
-        /* 输入框占位符样式 */
-        ::placeholder {
-            color: var(--text-muted);
-            opacity: 1;
-        }
-        
-        :-ms-input-placeholder {
-            color: var(--text-muted);
-        }
-        
-        ::-ms-input-placeholder {
-            color: var(--text-muted);
-        }
-    </style>
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-    <!-- 数字雨背景 -->
-    <canvas id="matrix-bg"></canvas>
-    
-    <div class="container">
-        <h1>自动签到管理工具</h1>
-        
-        <div class="tab-container">
-            <div class="tabs">
-                <div class="tab active" data-tab="add">添加签到</div>
-                <div class="tab" data-tab="manage">管理签到</div>
-                <div class="tab" data-tab="history">签到历史</div>
-                <div class="tab" data-tab="notify">通知设置</div>
-                <div class="tab" data-tab="schedule">定时设置</div>
-                <div class="tab" data-tab="password">密码设置</div>
-                <div class="tab" data-tab="logout" id="logoutTab" style="margin-left: auto;">退出登录</div>
+    <div class="page">
+        <section class="hero card">
+            <div>
+                <span class="eyebrow">QianDao V2</span>
+                <h1>Self-hosted sign-in control panel rebuilt for Docker-first workflows.</h1>
+                <p>Modern task management, concurrent execution, scheduler control, notifications, and a cleaner interface in a single lightweight Go service.</p>
             </div>
-            
-            <div class="tab-content active" id="add">
-                <div class="section">
-                    <h2>1. 输入Curl命令</h2>
-                    <div class="form-group">
-                        <label for="curlInput">Curl命令：</label>
-                        <textarea id="curlInput" placeholder="请粘贴完整的curl命令，例如：&#10;curl 'https://example.com/signin' \&#10;  -H 'Content-Type: application/json' \&#10;  -d '{"action":"signin"}'"></textarea>
+            <div class="hero-actions">
+                <button class="primary" id="runAllBtn">Run all enabled tasks</button>
+                <button class="secondary" id="refreshBtn">Refresh</button>
+                <a class="ghost button-link" href="/logout">Logout</a>
+            </div>
+        </section>
+
+        <section id="message" class="message hidden"></section>
+
+        <section class="summary-grid" id="summaryGrid"></section>
+
+        <section class="layout">
+            <div class="column">
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Tasks</h2>
+                            <p>Create, edit, run, and review each task from one place.</p>
+                        </div>
+                        <button class="secondary" id="newTaskBtn">New task</button>
                     </div>
-                    <div class="form-group">
-                        <label for="siteName">网站名称：</label>
-                        <input type="text" id="siteName" placeholder="例如：示例网站">
-                    </div>
-                    <div class="form-group">
-                        <label for="requestMethod">请求方法：</label>
-                        <select id="requestMethod">
-                            <option value="GET">GET</option>
-                            <option value="POST">POST</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskEnabled">启用任务定时：</label>
-                        <input type="checkbox" id="taskEnabled" style="width: auto; margin-right: 10px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="taskHour">小时（0-23）：</label>
-                        <input type="number" id="taskHour" min="0" max="23" value="8" style="width: 100px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="taskMinute">分钟（0-59）：</label>
-                        <input type="number" id="taskMinute" min="0" max="59" value="0" style="width: 100px;">
-                    </div>
-                    <button class="btn" onclick="parseCurl()">解析Curl</button>
+                    <div id="taskList" class="task-list"></div>
                 </div>
-                
-                <div class="section">
-                    <h2>2. 解析结果</h2>
-                    <div id="parseResult" class="result"></div>
-                    <button class="btn" onclick="saveSignin()" id="saveBtn" style="display: none;">保存签到</button>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>History</h2>
+                            <p>The newest run results appear first.</p>
+                        </div>
+                        <button class="danger" id="clearHistoryBtn">Clear history</button>
+                    </div>
+                    <div id="historyList" class="history-list"></div>
                 </div>
             </div>
-            
-            <div class="tab-content" id="manage">
-                <div class="section">
-                    <h2>签到列表</h2>
-                    <button class="btn" onclick="runAllSignin()">运行全部签到</button>
-                    <div id="signinList" class="signin-list"></div>
+
+            <div class="column">
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2 id="taskFormTitle">Create task</h2>
+                            <p>Curl import is supported, but direct editing stays available.</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Name</span>
+                            <input id="taskName" placeholder="Community daily sign-in">
+                        </label>
+                        <label class="field">
+                            <span>Method</span>
+                            <select id="taskMethod">
+                                <option>GET</option>
+                                <option>POST</option>
+                                <option>PUT</option>
+                                <option>PATCH</option>
+                                <option>DELETE</option>
+                            </select>
+                        </label>
+                        <label class="field span-2">
+                            <span>Curl command</span>
+                            <textarea id="taskCurl" placeholder="Paste a curl command here."></textarea>
+                        </label>
+                        <label class="field span-2">
+                            <span>URL</span>
+                            <input id="taskURL" placeholder="https://example.com/signin">
+                        </label>
+                        <label class="field span-2">
+                            <span>Headers (JSON)</span>
+                            <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
+                        </label>
+                        <label class="field span-2">
+                            <span>Body</span>
+                            <textarea id="taskBody" placeholder="Optional request body"></textarea>
+                        </label>
+                        <label class="field">
+                            <span>Timeout seconds</span>
+                            <input id="taskTimeout" type="number" min="1" max="120" value="30">
+                        </label>
+                        <label class="field">
+                            <span>Retry count</span>
+                            <input id="taskRetry" type="number" min="0" max="5" value="0">
+                        </label>
+                        <label class="field">
+                            <span>Success keywords</span>
+                            <input id="taskSuccessKeywords" placeholder="success, signed in">
+                        </label>
+                        <label class="field">
+                            <span>Failure keywords</span>
+                            <input id="taskFailureKeywords" placeholder="error, expired">
+                        </label>
+                        <label class="field">
+                            <span>Task hour</span>
+                            <input id="taskHour" type="number" min="0" max="23" value="8">
+                        </label>
+                        <label class="field">
+                            <span>Task minute</span>
+                            <input id="taskMinute" type="number" min="0" max="59" value="0">
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <label><input id="taskEnabled" type="checkbox" checked> Enabled</label>
+                        <label><input id="taskScheduleEnabled" type="checkbox"> Use per-task schedule</label>
+                    </div>
+                    <div class="button-row">
+                        <button class="secondary" id="parseCurlBtn">Parse curl</button>
+                        <button class="primary" id="saveTaskBtn">Save task</button>
+                        <button class="ghost" id="resetTaskBtn">Reset</button>
+                    </div>
+                    <pre id="taskPreview" class="preview">Parsed task details will appear here.</pre>
+                </div>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Global schedule</h2>
+                            <p>Tasks without a per-task schedule fall back to this timer.</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Hour</span>
+                            <input id="scheduleHour" type="number" min="0" max="23">
+                        </label>
+                        <label class="field">
+                            <span>Minute</span>
+                            <input id="scheduleMinute" type="number" min="0" max="59">
+                        </label>
+                        <label class="field span-2">
+                            <span>Parallel workers</span>
+                            <input id="scheduleWorkers" type="number" min="1" max="8">
+                        </label>
+                    </div>
+                    <div class="toggle-row">
+                        <label><input id="scheduleEnabled" type="checkbox"> Enable global schedule</label>
+                    </div>
+                    <div class="button-row">
+                        <button class="primary" id="saveScheduleBtn">Save schedule</button>
+                        <button class="secondary" id="checkScheduleBtn">Check now</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Notifications</h2>
+                            <p>Telegram and generic webhook are available.</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Telegram bot token</span>
+                            <input id="telegramBotToken">
+                        </label>
+                        <label class="field">
+                            <span>Telegram chat ID</span>
+                            <input id="telegramChatID">
+                        </label>
+                        <label class="field span-2">
+                            <span>Webhook URL</span>
+                            <input id="webhookURL" placeholder="https://example.com/webhook">
+                        </label>
+                    </div>
+                    <div class="toggle-row stacked">
+                        <label><input id="telegramEnabled" type="checkbox"> Enable Telegram</label>
+                        <label><input id="webhookEnabled" type="checkbox"> Enable webhook</label>
+                        <label><input id="notifyOnSuccess" type="checkbox"> Notify on success</label>
+                        <label><input id="notifyOnFailure" type="checkbox"> Notify on failure</label>
+                    </div>
+                    <div class="button-row">
+                        <button class="primary" id="saveNotifyBtn">Save notifications</button>
+                        <button class="secondary" id="testNotifyBtn">Send test</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-head">
+                        <div>
+                            <h2>Access protection</h2>
+                            <p>Optional login screen for shared deployments.</p>
+                        </div>
+                    </div>
+                    <label class="field">
+                        <span>New password</span>
+                        <input id="securityPassword" type="password" placeholder="At least 6 characters">
+                    </label>
+                    <div class="toggle-row">
+                        <label><input id="securityEnabled" type="checkbox"> Require login</label>
+                    </div>
+                    <button class="primary" id="saveSecurityBtn">Save security settings</button>
                 </div>
             </div>
-            
-            <div class="tab-content" id="notify">
-                <div class="section">
-                    <h2>Telegram通知设置</h2>
-                    <div class="form-group">
-                        <label for="tgBotToken">Bot Token：</label>
-                        <input type="text" id="tgBotToken" placeholder="例如：123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11">
-                    </div>
-                    <div class="form-group">
-                        <label for="tgChatId">Chat ID：</label>
-                        <input type="text" id="tgChatId" placeholder="例如：123456789">
-                    </div>
-                    <button class="btn" onclick="saveNotifyConfig()">保存配置</button>
-                    <button class="btn btn-secondary" onclick="testNotify()">测试通知</button>
-                    <div id="notifyResult" class="result" style="margin-top: 15px;"></div>
-                </div>
-                <div class="section">
-                    <h2>设置说明</h2>
-                    <p>1. 如何获取Bot Token：</p>
-                    <ul>
-                        <li>在Telegram中搜索 <strong>@BotFather</strong></li>
-                        <li>发送 <code>/newbot</code> 命令</li>
-                        <li>按照提示设置机器人名称和用户名</li>
-                        <li>获取生成的Bot Token</li>
-                    </ul>
-                    <p>2. 如何获取Chat ID：</p>
-                    <ul>
-                        <li>在Telegram中搜索 <strong>@userinfobot</strong></li>
-                        <li>发送任意消息</li>
-                        <li>获取返回的ID</li>
-                    </ul>
-                    <p>3. 注意事项：</p>
-                    <ul>
-                        <li>确保机器人已添加到您的聊天中</li>
-                        <li>确保机器人有发送消息的权限</li>
-                        <li>测试通知以验证配置是否正确</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="tab-content" id="schedule">
-                <div class="section">
-                    <h2>定时签到设置</h2>
-                    <div class="form-group">
-                        <label for="scheduleEnabled">启用定时签到：</label>
-                        <input type="checkbox" id="scheduleEnabled" style="width: auto; margin-right: 10px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="scheduleHour">小时（0-23）：</label>
-                        <input type="number" id="scheduleHour" min="0" max="23" value="8" style="width: 100px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="scheduleMinute">分钟（0-59）：</label>
-                        <input type="number" id="scheduleMinute" min="0" max="59" value="0" style="width: 100px;">
-                    </div>
-                    <button class="btn" onclick="saveScheduleConfig()">保存配置</button>
-                    <div id="scheduleResult" class="result" style="margin-top: 15px;"></div>
-                </div>
-                <div class="section">
-                    <h2>设置说明</h2>
-                    <p>1. 定时签到功能：</p>
-                    <ul>
-                        <li>启用后，系统会在每天指定的时间自动运行所有签到</li>
-                        <li>时间设置精确到分钟</li>
-                        <li>签到结果会通过通知系统发送</li>
-                    </ul>
-                    <p>2. 注意事项：</p>
-                    <ul>
-                        <li>确保服务器在指定时间处于运行状态</li>
-                        <li>定时任务依赖于服务器时间</li>
-                        <li>保存配置后立即生效</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="tab-content" id="history">
-                <div class="section">
-                    <h2>签到历史记录</h2>
-                    <button class="btn" onclick="loadHistory()">刷新历史</button>
-                    <button class="btn btn-danger" onclick="clearHistory()">清空历史</button>
-                    <div id="historyList" class="signin-list" style="margin-top: 20px;"></div>
-                </div>
-                <div class="section">
-                    <h2>历史记录说明</h2>
-                    <p>1. 记录内容：</p>
-                    <ul>
-                        <li>包含所有签到任务的运行记录</li>
-                        <li>显示任务名称、URL、方法、结果、状态码等信息</li>
-                        <li>记录签到时间</li>
-                    </ul>
-                    <p>2. 注意事项：</p>
-                    <ul>
-                        <li>系统自动保留最近100条记录</li>
-                        <li>清空历史后无法恢复</li>
-                        <li>手动运行和定时运行的记录都会显示</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="tab-content" id="password">
-                <div class="section">
-                    <h2>密码设置</h2>
-                    <div class="form-group">
-                        <label for="passwordEnabled">启用密码保护：</label>
-                        <input type="checkbox" id="passwordEnabled" style="width: auto; margin-right: 10px;">
-                    </div>
-                    <div class="form-group">
-                        <label for="passwordInput">新密码：</label>
-                        <input type="password" id="passwordInput" placeholder="请输入新密码">
-                    </div>
-                    <button class="btn" onclick="savePasswordConfig()">保存配置</button>
-                    <div id="passwordResult" class="result" style="margin-top: 15px;"></div>
-                </div>
-                <div class="section">
-                    <h2>设置说明</h2>
-                    <p>1. 密码保护功能：</p>
-                    <ul>
-                        <li>启用后，访问系统需要输入密码</li>
-                        <li>密码将被加密存储</li>
-                        <li>保存配置后立即生效</li>
-                    </ul>
-                    <p>2. 注意事项：</p>
-                    <ul>
-                        <li>请妥善保管密码，忘记密码后需要删除password_config.json文件重置</li>
-                        <li>建议使用强密码，包含字母、数字和特殊字符</li>
-                        <li>保存配置后会自动跳转到登录页面</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
-    
-    <script>
-        // 数字雨效果
-        window.onload = function() {
-            const canvas = document.getElementById('matrix-bg');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-            const charSize = 14;
-            const columns = canvas.width / charSize;
-            
-            const drops = [];
-            for (let i = 0; i < columns; i++) {
-                drops[i] = 1;
-            }
-            
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.fillStyle = '#00ff00';
-                ctx.font = charSize + 'px monospace';
-                
-                for (let i = 0; i < drops.length; i++) {
-                    const text = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillText(text, i * charSize, drops[i] * charSize);
-                    
-                    if (drops[i] * charSize > canvas.height && Math.random() > 0.975) {
-                        drops[i] = 0;
-                    }
-                    
-                    drops[i]++;
-                }
-            }
-            
-            setInterval(draw, 33);
-        };
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSigninList();
-            initTabs();
-            checkPasswordConfig();
-        });
-        
-        // 检查密码配置并显示/隐藏退出登录标签
-        function checkPasswordConfig() {
-            fetch('/password/config')
-                .then(response => response.json())
-                .then(config => {
-                    const logoutTab = document.getElementById('logoutTab');
-                    if (config.enabled) {
-                        logoutTab.style.display = 'block';
-                    } else {
-                        logoutTab.style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('检查密码配置失败:', error);
-                });
-        }
-        
-        // 初始化标签页
-        function initTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // 处理退出登录
-                    if (tabId === 'logout') {
-                        // 检查密码是否启用
-                        fetch('/password/config')
-                            .then(response => response.json())
-                            .then(config => {
-                                if (config.enabled) {
-                                    window.location.href = '/logout';
-                                }
-                            })
-                            .catch(error => {
-                                console.error('检查密码配置失败:', error);
-                            });
-                        return;
-                    }
-                    
-                    // 更新标签状态
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // 更新内容状态
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(tabId).classList.add('active');
-                    
-                    // 加载对应内容
-                    if (tabId === 'manage') {
-                        loadSigninList();
-                    } else if (tabId === 'notify') {
-                        loadNotifyConfig();
-                    } else if (tabId === 'schedule') {
-                        loadScheduleConfig();
-                    } else if (tabId === 'password') {
-                        loadPasswordConfig();
-                    } else if (tabId === 'history') {
-                        loadHistory();
-                    }
-                });
-            });
-        }
-        
-        // 加载签到历史记录
-        function loadHistory() {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '<p>加载中...</p>';
-            
-            // 从后端获取历史记录
-            fetch('/history')
-            .then(response => response.json())
-            .then(data => {
-                const history = data.history || [];
-                historyList.innerHTML = '';
-                
-                if (history.length === 0) {
-                    historyList.innerHTML = '<p>暂无签到历史记录</p>';
-                    return;
-                }
-                
-                history.forEach((record, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'signin-item';
-                    item.id = `history-item-${index}`;
-                    
-                    // 根据结果设置样式
-                    const resultClass = record.success ? 'success' : 'error';
-                    const resultIcon = record.success ? '✅' : '❌';
-                    const resultText = record.success ? '成功' : '失败';
-                    
-                    item.innerHTML = `
-                        <h3>${resultIcon} ${record.name}</h3>
-                        <p><strong>时间:</strong> ${record.timestamp}</p>
-                        <p><strong>URL:</strong> ${record.url.length > 100 ? record.url.substring(0, 100) + '...' : record.url}</p>
-                        <p><strong>方法:</strong> ${record.method}</p>
-                        <p><strong>结果:</strong> <span class="${resultClass}">${resultText}</span></p>
-                        ${record.status_code ? `<p><strong>状态码:</strong> ${record.status_code}</p>` : ''}
-                        ${record.error ? `<p><strong>错误:</strong> ${record.error.length > 100 ? record.error.substring(0, 100) + '...' : escapeHtml(record.error)}</p>` : ''}
-                        <div id="history-details-${index}" style="display: none; margin-top: 15px; padding: 15px; background-color: var(--bg-tertiary); border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                            <h4>详细信息</h4>
-                            <p><strong>完整URL:</strong> ${record.url}</p>
-                            ${record.error ? `<p><strong>完整错误信息:</strong> ${escapeHtml(record.error)}</p>` : ''}
-                            ${record.content ? `
-                                <p><strong>完整返回内容:</strong></p>
-                                <pre style="white-space: pre-wrap; font-size: 12px; margin: 10px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 300px; overflow-y: auto;">${escapeHtml(record.content)}</pre>
-                            ` : ''}
-                        </div>
-                        <div style="margin-top: 10px; text-align: right;">
-                            <button class="btn btn-secondary" onclick="toggleHistoryDetails(${index})" style="font-size: 12px; padding: 6px 12px;">查看详情</button>
-                        </div>
-                    `;
-                    historyList.appendChild(item);
-                });
-            })
-            .catch(error => {
-                historyList.innerHTML = '<p>加载失败：' + error.message + '</p>';
-            });
-        }
-        
-        // 切换历史记录详情的显示/隐藏
-        function toggleHistoryDetails(index) {
-            const detailsDiv = document.getElementById(`history-details-${index}`);
-            const toggleBtn = document.querySelector(`#history-item-${index} button`);
-            
-            if (detailsDiv.style.display === 'none' || detailsDiv.style.display === '') {
-                detailsDiv.style.display = 'block';
-                toggleBtn.textContent = '收起详情';
-            } else {
-                detailsDiv.style.display = 'none';
-                toggleBtn.textContent = '查看详情';
-            }
-        }
-        
-        // 清空签到历史记录
-        function clearHistory() {
-            if (confirm('确定要清空所有签到历史记录吗？此操作不可恢复。')) {
-                fetch('/history/clear', {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showMessage('历史记录已清空', 'success');
-                        loadHistory();
-                    } else {
-                        showMessage('清空失败：' + (data.error || '未知错误'), 'error');
-                    }
-                })
-                .catch(error => {
-                    showMessage('清空失败：' + error.message, 'error');
-                });
-            }
-        }
-        
-        // 解析Curl命令
-        function parseCurl() {
-            const curlInput = document.getElementById('curlInput').value;
-            const siteName = document.getElementById('siteName').value;
-            const requestMethod = document.getElementById('requestMethod').value;
-            const taskEnabled = document.getElementById('taskEnabled').checked;
-            const taskHour = parseInt(document.getElementById('taskHour').value);
-            const taskMinute = parseInt(document.getElementById('taskMinute').value);
-            
-            if (!curlInput) {
-                showMessage('请输入Curl命令', 'error');
-                return;
-            }
-            
-            if (!siteName) {
-                showMessage('请输入网站名称', 'error');
-                return;
-            }
-            
-            // 发送到后端解析
-            fetch('/parse', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `curl=${encodeURIComponent(curlInput)}&name=${encodeURIComponent(siteName)}&method=${encodeURIComponent(requestMethod)}&taskEnabled=${taskEnabled}&taskHour=${taskHour}&taskMinute=${taskMinute}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('parseResult').textContent = JSON.stringify(data.config, null, 2);
-                    document.getElementById('saveBtn').style.display = 'inline-block';
-                    showMessage('解析成功', 'success');
-                } else {
-                    showMessage('解析失败：' + data.error, 'error');
-                    document.getElementById('parseResult').textContent = '';
-                    document.getElementById('saveBtn').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                showMessage('解析失败：' + error.message, 'error');
-                document.getElementById('parseResult').textContent = '';
-                document.getElementById('saveBtn').style.display = 'none';
-            });
-        }
-        
-        // 保存签到配置
-        function saveSignin() {
-            const curlInput = document.getElementById('curlInput').value;
-            const siteName = document.getElementById('siteName').value;
-            const requestMethod = document.getElementById('requestMethod').value;
-            const taskEnabled = document.getElementById('taskEnabled').checked;
-            const taskHour = parseInt(document.getElementById('taskHour').value);
-            const taskMinute = parseInt(document.getElementById('taskMinute').value);
-            
-            if (!curlInput) {
-                showMessage('请输入Curl命令', 'error');
-                return;
-            }
-            
-            if (!siteName) {
-                showMessage('请输入网站名称', 'error');
-                return;
-            }
-            
-            // 发送到后端解析
-            fetch('/parse', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: `curl=${encodeURIComponent(curlInput)}&name=${encodeURIComponent(siteName)}&method=${encodeURIComponent(requestMethod)}&taskEnabled=${taskEnabled}&taskHour=${taskHour}&taskMinute=${taskMinute}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const config = data.config;
-                    
-                    // 检查是否是编辑模式
-                    if (window.editIndex !== undefined) {
-                        // 编辑模式：更新现有签到
-                        fetch(`/update/${window.editIndex}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(config)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showMessage('更新成功', 'success');
-                                document.getElementById('curlInput').value = '';
-                                document.getElementById('siteName').value = '';
-                                document.getElementById('parseResult').textContent = '';
-                                document.getElementById('saveBtn').style.display = 'none';
-                                window.editIndex = undefined;
-                            } else {
-                                showMessage('更新失败', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            showMessage('更新失败：' + error.message, 'error');
-                        });
-                    } else {
-                        // 新建模式：创建新签到
-                        fetch('/save', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(config)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                showMessage('保存成功', 'success');
-                                document.getElementById('curlInput').value = '';
-                                document.getElementById('siteName').value = '';
-                                document.getElementById('parseResult').textContent = '';
-                                document.getElementById('saveBtn').style.display = 'none';
-                            } else {
-                                showMessage('保存失败', 'error');
-                            }
-                        })
-                        .catch(error => {
-                            showMessage('保存失败：' + error.message, 'error');
-                        });
-                    }
-                } else {
-                    showMessage('解析失败：' + data.error, 'error');
-                }
-            })
-            .catch(error => {
-                showMessage('解析失败：' + error.message, 'error');
-            });
-        }
-        
-        // 加载签到列表
-        function loadSigninList() {
-            const signinList = document.getElementById('signinList');
-            signinList.innerHTML = '<p>加载中...</p>';
-            
-            // 从后端获取配置列表
-            fetch('/')
-            .then(response => response.text())
-            .then(html => {
-                // 解析HTML获取配置列表
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const configs = JSON.parse(doc.getElementById('configs-data')?.textContent || '[]');
-                
-                signinList.innerHTML = '';
-                
-                if (configs.length === 0) {
-                    signinList.innerHTML = '<p>暂无签到配置</p>';
-                    return;
-                }
-                
-                configs.forEach((config, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'signin-item';
-                    item.innerHTML = `
-                        <h3>${config.name}</h3>
-                        <p><strong>URL:</strong> ${config.url}</p>
-                        <p><strong>方法:</strong> ${config.method}</p>
-                        <div class="actions">
-                            <button class="btn" onclick="runSignin(${index})">运行签到</button>
-                            <button class="btn btn-secondary" onclick="editSignin(${index})">编辑</button>
-                            <button class="btn btn-danger" onclick="deleteSignin(${index})">删除</button>
-                        </div>
-                        <div id="response-${index}" class="response" style="display: none;"></div>
-                    `;
-                    signinList.appendChild(item);
-                });
-            })
-            .catch(error => {
-                signinList.innerHTML = '<p>加载失败：' + error.message + '</p>';
-            });
-        }
-        
-        // HTML转义函数，确保特殊字符被正确显示
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        // 运行单个签到
-        function runSignin(index) {
-            const responseDiv = document.getElementById(`response-${index}`);
-            
-            responseDiv.textContent = '运行中...';
-            responseDiv.className = 'response';
-            responseDiv.style.display = 'block';
-            
-            // 发送到后端运行
-            fetch(`/run/${index}`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                let contentPreview = '';
-                // 确保总是显示返回内容，无论是否为空
-                const rawContent = data.content || '无返回内容';
-                contentPreview = rawContent.substring(0, 200);
-                if (rawContent.length > 200) {
-                    contentPreview += '...';
-                }
-                
-                // 转义HTML特殊字符
-                const escapedContent = escapeHtml(contentPreview);
-                
-                if (data.success) {
-                    // 成功时显示成功信息和返回内容
-                    responseDiv.innerHTML = `✅ 签到成功<br>状态码: ${data.status_code || '未知'}<br>返回内容: <pre style="white-space: pre-wrap; font-size: 12px; margin: 5px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 200px; overflow-y: auto;">${escapedContent}</pre>`;
-                    responseDiv.className = 'response success';
-                    responseDiv.style.display = 'block';
-                    // 5秒后自动隐藏成功提示
-                    setTimeout(() => {
-                        responseDiv.style.display = 'none';
-                    }, 5000);
-                } else {
-                    // 失败时显示具体的失败信息和返回内容
-                    responseDiv.innerHTML = `❌ 失败: ${escapeHtml(data.error)}<br>状态码: ${data.status_code || '未知'}<br>返回内容: <pre style="white-space: pre-wrap; font-size: 12px; margin: 5px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 200px; overflow-y: auto;">${escapedContent}</pre>`;
-                    responseDiv.className = 'response error';
-                    responseDiv.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                // 异常时显示错误信息
-                responseDiv.innerHTML = `❌ 失败: ${escapeHtml(error.message)}<br>状态码: 未知<br>返回内容: <pre style="white-space: pre-wrap; font-size: 12px; margin: 5px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 200px; overflow-y: auto;">无</pre>`;
-                responseDiv.className = 'response error';
-                responseDiv.style.display = 'block';
-            });
-        }
-        
-        // 运行全部签到
-        function runAllSignin() {
-            // 发送到后端运行全部
-            fetch('/run-all', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    data.results.forEach(result => {
-                        const responseDiv = document.getElementById(`response-${result.index}`);
-                        if (responseDiv) {
-                            let contentPreview = '';
-                            // 确保总是显示返回内容，无论是否为空
-                            const rawContent = result.result.content || '无返回内容';
-                            contentPreview = rawContent.substring(0, 200);
-                            if (rawContent.length > 200) {
-                                contentPreview += '...';
-                            }
-                            
-                            // 转义HTML特殊字符
-                            const escapedContent = escapeHtml(contentPreview);
-                            
-                            if (result.result.success) {
-                                // 成功时显示成功信息和返回内容
-                                responseDiv.innerHTML = `✅ 签到成功<br>状态码: ${result.result.status_code || '未知'}<br>返回内容: <pre style="white-space: pre-wrap; font-size: 12px; margin: 5px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 200px; overflow-y: auto;">${escapedContent}</pre>`;
-                                responseDiv.className = 'response success';
-                                responseDiv.style.display = 'block';
-                                // 5秒后自动隐藏成功提示
-                                setTimeout(() => {
-                                    responseDiv.style.display = 'none';
-                                }, 5000);
-                            } else {
-                                // 失败时显示具体的失败信息和返回内容
-                                responseDiv.innerHTML = `❌ 失败: ${escapeHtml(result.result.error)}<br>状态码: ${result.result.status_code || '未知'}<br>返回内容: <pre style="white-space: pre-wrap; font-size: 12px; margin: 5px 0; padding: 10px; background-color: rgba(255, 255, 255, 0.5); border-radius: 4px; max-height: 200px; overflow-y: auto;">${escapedContent}</pre>`;
-                                responseDiv.className = 'response error';
-                                responseDiv.style.display = 'block';
-                            }
-                        }
-                    });
-                    showMessage('全部签到已执行', 'success');
-                } else {
-                    showMessage('执行失败：' + escapeHtml(data.error), 'error');
-                }
-            })
-            .catch(error => {
-                showMessage('执行失败：' + escapeHtml(error.message), 'error');
-            });
-        }
-        
-        // 编辑签到
-        function editSignin(index) {
-            // 获取编辑数据
-            fetch(`/edit/${index}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('curlInput').value = data.config.curl;
-                    document.getElementById('siteName').value = data.config.name;
-                    
-                    // 设置请求方法
-                    document.getElementById('requestMethod').value = data.config.method;
-                    
-                    // 设置定时选项
-                    const schedule = data.config.schedule || { enabled: false, hour: 8, minute: 0 };
-                    document.getElementById('taskEnabled').checked = schedule.enabled;
-                    document.getElementById('taskHour').value = schedule.hour;
-                    document.getElementById('taskMinute').value = schedule.minute;
-                    
-                    // 切换到添加标签页
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    document.querySelector('[data-tab="add"]').classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    document.getElementById('add').classList.add('active');
-                    
-                    // 存储编辑索引
-                    window.editIndex = data.index;
-                    showMessage('请修改后重新保存', 'success');
-                    
-                    // 显示保存按钮
-                    document.getElementById('saveBtn').style.display = 'inline-block';
-                } else {
-                    showMessage('编辑失败：' + data.error, 'error');
-                }
-            })
-            .catch(error => {
-                showMessage('编辑失败：' + error.message, 'error');
-            });
-        }
-        
-        // 删除签到
-        function deleteSignin(index) {
-            if (confirm('确定要删除这个签到配置吗？')) {
-                fetch(`/delete/${index}`, {
-                    method: 'POST'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        loadSigninList();
-                        showMessage('删除成功', 'success');
-                    } else {
-                        showMessage('删除失败：' + data.error, 'error');
-                    }
-                })
-                .catch(error => {
-                    showMessage('删除失败：' + error.message, 'error');
-                });
-            }
-        }
-        
-        // 显示消息
-        function showMessage(text, type) {
-            const message = document.createElement('div');
-            message.className = `message ${type}`;
-            message.textContent = text;
-            message.style.position = 'fixed';
-            message.style.top = '20px';
-            message.style.right = '20px';
-            message.style.padding = '15px';
-            message.style.borderRadius = '4px';
-            message.style.zIndex = '1000';
-            message.style.boxShadow = '0 0 10px rgba(0,255,0,0.3)';
-            
-            document.body.appendChild(message);
-            
-            setTimeout(() => {
-                message.style.opacity = '0';
-                message.style.transition = 'opacity 0.5s';
-                setTimeout(() => {
-                    document.body.removeChild(message);
-                }, 500);
-            }, 3000);
-        }
-        
-        // 加载通知配置
-        function loadNotifyConfig() {
-            fetch('/notify/config')
-                .then(response => response.json())
-                .then(config => {
-                    document.getElementById('tgBotToken').value = config.tg_bot_token;
-                    document.getElementById('tgChatId').value = config.tg_chat_id;
-                })
-                .catch(error => {
-                    console.error('加载通知配置失败:', error);
-                });
-        }
-        
-        // 保存通知配置
-        function saveNotifyConfig() {
-            const config = {
-                tg_bot_token: document.getElementById('tgBotToken').value,
-                tg_chat_id: document.getElementById('tgChatId').value
-            };
-            
-            fetch('/notify/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(config)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage('保存成功', 'success');
-                } else {
-                    showMessage('保存失败', 'error');
-                }
-            })
-            .catch(error => {
-                showMessage('保存失败：' + error.message, 'error');
-            });
-        }
-        
-        // 测试通知
-        function testNotify() {
-            const notifyResult = document.getElementById('notifyResult');
-            notifyResult.textContent = '发送中...';
-            
-            fetch('/notify/test', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    notifyResult.textContent = '测试通知发送成功！请检查Telegram。';
-                    showMessage('测试通知发送成功', 'success');
-                } else {
-                    // 显示具体的错误信息
-                    const errorMsg = data.error || '未知错误';
-                    notifyResult.textContent = `测试通知发送失败：${errorMsg}`;
-                    showMessage(`测试通知发送失败：${errorMsg}`, 'error');
-                }
-            })
-            .catch(error => {
-                notifyResult.textContent = '测试通知发送失败：' + error.message;
-                showMessage('测试通知发送失败：' + error.message, 'error');
-            });
-        }
-        
-        // 加载定时任务配置
-        function loadScheduleConfig() {
-            fetch('/schedule/config')
-                .then(response => response.json())
-                .then(config => {
-                    document.getElementById('scheduleEnabled').checked = config.enabled;
-                    document.getElementById('scheduleHour').value = config.hour;
-                    document.getElementById('scheduleMinute').value = config.minute;
-                })
-                .catch(error => {
-                    console.error('加载定时任务配置失败:', error);
-                });
-        }
-        
-        // 保存定时任务配置
-        function saveScheduleConfig() {
-            const config = {
-                enabled: document.getElementById('scheduleEnabled').checked,
-                hour: parseInt(document.getElementById('scheduleHour').value),
-                minute: parseInt(document.getElementById('scheduleMinute').value)
-            };
-            
-            fetch('/schedule/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(config)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showMessage('保存成功', 'success');
-                    document.getElementById('scheduleResult').textContent = '定时任务配置已保存！';
-                } else {
-                    showMessage('保存失败', 'error');
-                    document.getElementById('scheduleResult').textContent = '保存失败，请重试。';
-                }
-            })
-            .catch(error => {
-                showMessage('保存失败：' + error.message, 'error');
-                document.getElementById('scheduleResult').textContent = '保存失败：' + error.message;
-            });
-        }
-        
-        // 加载密码配置
-        function loadPasswordConfig() {
-            fetch('/password/config')
-                .then(response => response.json())
-                .then(config => {
-                    document.getElementById('passwordEnabled').checked = config.enabled;
-                })
-                .catch(error => {
-                    console.error('加载密码配置失败:', error);
-                });
-        }
-        
-        // 保存密码配置
-        function savePasswordConfig() {
-            const config = {
-                enabled: document.getElementById('passwordEnabled').checked,
-                password: document.getElementById('passwordInput').value
-            };
-            
-            console.log('保存密码配置:', config);
-            
-            fetch('/password/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(config)
-            })
-            .then(response => {
-                console.log('响应状态:', response.status);
-                console.log('响应头:', response.headers);
-                return response.json();
-            })
-            .then(data => {
-                console.log('响应数据:', data);
-                if (data.success) {
-                    showMessage('保存成功', 'success');
-                    document.getElementById('passwordResult').textContent = '密码配置已保存！';
-                    // 清空密码输入框
-                    document.getElementById('passwordInput').value = '';
-                    // 重新检查密码配置并更新退出登录标签
-                    checkPasswordConfig();
-                    // 如果启用了密码，跳转到登录页面
-                    if (config.enabled) {
-                        setTimeout(() => {
-                            window.location.href = '/logout';
-                        }, 1000);
-                    }
-                } else {
-                    // 显示具体的错误信息
-                    const errorMsg = data.error || '保存失败，请重试。';
-                    showMessage(errorMsg, 'error');
-                    document.getElementById('passwordResult').textContent = errorMsg;
-                }
-            })
-            .catch(error => {
-                console.error('保存失败错误:', error);
-                showMessage('保存失败：' + error.message, 'error');
-                document.getElementById('passwordResult').textContent = '保存失败：' + error.message;
-            });
-        }
-    </script>
-    
-    <!-- 版权信息 -->
-    <div class="footer">
-        <p>© 2026 自动签到管理工具 | <a href="https://github.com/gitcoinkuang/qiandao" target="_blank">GitHub 项目地址</a></p>
-    </div>
+
+    <script src="/static/app.js"></script>
 </body>
 </html>

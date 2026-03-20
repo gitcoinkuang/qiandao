@@ -1,0 +1,358 @@
+:root {
+    --bg: #f5efe7;
+    --bg-strong: #fff8f1;
+    --panel: rgba(255, 251, 246, 0.9);
+    --ink: #211d19;
+    --muted: #6b645c;
+    --line: rgba(61, 46, 31, 0.12);
+    --accent: #bf5b31;
+    --accent-dark: #8d3f1d;
+    --success: #1e7c60;
+    --danger: #ad4139;
+    --shadow: 0 24px 64px rgba(42, 26, 11, 0.12);
+    --radius: 22px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(191, 91, 49, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(30, 124, 96, 0.14), transparent 24%),
+        linear-gradient(180deg, #f8f2e9 0%, #f0e8de 100%);
+}
+
+.page {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 28px;
+}
+
+.card, .login-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+}
+
+.hero {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: end;
+    padding: 28px;
+}
+
+.eyebrow {
+    display: inline-flex;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(191, 91, 49, 0.12);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 14px 0 10px;
+    font-size: 44px;
+    line-height: 1.04;
+}
+
+h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+p, .field span, .section-head p, .meta {
+    color: var(--muted);
+}
+
+.hero-actions,
+.button-row,
+.toggle-row,
+.summary-grid,
+.layout,
+.form-grid,
+.section-head,
+.task-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.hero-actions,
+.button-row,
+.task-actions,
+.toggle-row {
+    flex-wrap: wrap;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 18px 0;
+}
+
+.summary-card {
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--bg-strong);
+    border: 1px solid var(--line);
+}
+
+.summary-card strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 30px;
+}
+
+.layout {
+    align-items: start;
+}
+
+.column {
+    display: grid;
+    gap: 18px;
+    flex: 1;
+}
+
+.card {
+    padding: 22px;
+}
+
+.section-head {
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 18px;
+}
+
+.task-list, .history-list {
+    display: grid;
+    gap: 14px;
+}
+
+.task-card, .history-card {
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--bg-strong);
+    border: 1px solid var(--line);
+}
+
+.task-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.pill-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+}
+
+.pill,
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.pill {
+    color: var(--muted);
+    border: 1px solid var(--line);
+}
+
+.status-idle {
+    background: rgba(107, 100, 92, 0.12);
+    color: var(--muted);
+}
+
+.status-success {
+    background: rgba(30, 124, 96, 0.12);
+    color: var(--success);
+}
+
+.status-failed {
+    background: rgba(173, 65, 57, 0.12);
+    color: var(--danger);
+}
+
+button,
+.button-link {
+    appearance: none;
+    border: 0;
+    border-radius: 14px;
+    padding: 11px 16px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+}
+
+button:hover,
+.button-link:hover {
+    transform: translateY(-1px);
+}
+
+.primary {
+    background: var(--accent);
+    color: #fff;
+}
+
+.secondary {
+    background: rgba(33, 29, 25, 0.06);
+    color: var(--ink);
+}
+
+.ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--line);
+}
+
+.danger {
+    background: rgba(173, 65, 57, 0.12);
+    color: var(--danger);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.span-2 {
+    grid-column: 1 / -1;
+}
+
+input, select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fffdfa;
+    padding: 12px 14px;
+    font: inherit;
+    color: var(--ink);
+}
+
+textarea {
+    min-height: 112px;
+    resize: vertical;
+}
+
+.preview, .history-preview {
+    margin: 0;
+    padding: 12px;
+    border-radius: 14px;
+    background: #f4ece3;
+    color: #45372c;
+    font-size: 12px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow: auto;
+}
+
+.stacked {
+    display: grid;
+}
+
+.message {
+    padding: 14px 16px;
+    border-radius: 16px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.hidden {
+    display: none;
+}
+
+.message.success {
+    background: rgba(30, 124, 96, 0.12);
+    color: var(--success);
+}
+
+.message.error {
+    background: rgba(173, 65, 57, 0.12);
+    color: var(--danger);
+}
+
+.login-body {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.login-card {
+    width: min(460px, 100%);
+    padding: 34px;
+}
+
+.error-box {
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(173, 65, 57, 0.12);
+    color: var(--danger);
+    font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .layout {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 760px) {
+    .page {
+        padding: 16px;
+    }
+
+    .hero {
+        flex-direction: column;
+        align-items: start;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    .summary-grid,
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .span-2 {
+        grid-column: auto;
+    }
+}

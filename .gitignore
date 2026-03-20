@@ -1,0 +1,5 @@
+.gocache/
+qiandao.exe
+qiandao
+data/*
+!data/.gitkeep
