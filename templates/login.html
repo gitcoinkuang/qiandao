@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QianDao V2 登录</title>
-    <link rel="stylesheet" href="/static/app.css">
+    <title>QianDao V2 &#x767B;&#x5F55;</title>
+    <link rel="stylesheet" href="/static/app.css?v=20260320">
 </head>
 <body class="login-body">
     <form class="login-card" method="post" action="/login">
-        <span class="eyebrow">安全登录</span>
-        <h1>登录 QianDao V2</h1>
-        <p>当前控制台已启用访问保护，请输入密码后继续。</p>
+        <span class="eyebrow">&#x5B89;&#x5168;&#x767B;&#x5F55;</span>
+        <h1>&#x767B;&#x5F55; QianDao V2</h1>
+        <p>&#x5F53;&#x524D;&#x63A7;&#x5236;&#x53F0;&#x5DF2;&#x542F;&#x7528;&#x8BBF;&#x95EE;&#x4FDD;&#x62A4;&#xFF0C;&#x8BF7;&#x8F93;&#x5165;&#x5BC6;&#x7801;&#x540E;&#x7EE7;&#x7EED;&#x3002;</p>
         {{ if .Error }}
         <div class="error-box">{{ .Error }}</div>
         {{ end }}
         <label class="field">
-            <span>密码</span>
+            <span>&#x5BC6;&#x7801;</span>
             <input name="password" type="password" required autofocus>
         </label>
-        <button class="primary full-width" type="submit">进入控制台</button>
+        <button class="primary full-width" type="submit">&#x8FDB;&#x5165;&#x63A7;&#x5236;&#x53F0;</button>
     </form>
 </body>
 </html>
