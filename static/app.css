@@ -316,6 +316,19 @@ p,
     align-items: start;
 }
 
+.task-list-panel,
+.task-editor-panel {
+    max-height: calc(100vh - 128px);
+    overflow: hidden;
+}
+
+.task-list-body,
+.task-editor-body {
+    overflow: auto;
+    max-height: calc(100vh - 230px);
+    padding-right: 6px;
+}
+
 .settings-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -530,6 +543,7 @@ textarea:focus {
 
 textarea {
     min-height: 96px;
+    max-height: 180px;
     resize: vertical;
 }
 
@@ -548,7 +562,7 @@ textarea {
 }
 
 .preview {
-    max-height: 220px;
+    max-height: 180px;
     margin-top: 12px;
 }
 
@@ -644,6 +658,19 @@ textarea {
     .workspace-grid,
     .settings-grid {
         grid-template-columns: 1fr;
+    }
+
+    .task-list-panel,
+    .task-editor-panel {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .task-list-body,
+    .task-editor-body {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
     }
 
     .compact-panel {
