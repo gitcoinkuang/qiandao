@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QianDao V2 Login</title>
+    <title>QianDao V2 登录</title>
     <link rel="stylesheet" href="/static/app.css">
 </head>
 <body class="login-body">
     <form class="login-card" method="post" action="/login">
-        <span class="eyebrow">Protected</span>
-        <h1>Sign in to QianDao V2</h1>
-        <p>The control panel is protected. Enter your password to continue.</p>
+        <span class="eyebrow">安全登录</span>
+        <h1>登录 QianDao V2</h1>
+        <p>当前控制台已启用访问保护，请输入密码后继续。</p>
         {{ if .Error }}
         <div class="error-box">{{ .Error }}</div>
         {{ end }}
         <label class="field">
-            <span>Password</span>
+            <span>密码</span>
             <input name="password" type="password" required autofocus>
         </label>
-        <button class="primary full-width" type="submit">Enter control panel</button>
+        <button class="primary full-width" type="submit">进入控制台</button>
     </form>
 </body>
 </html>

@@ -133,6 +133,10 @@ func defaultState() AppState {
 				Minute:     0,
 				MaxWorkers: 4,
 			},
+			Security: SecuritySettings{
+				Enabled:      true,
+				PasswordHash: hashPassword(defaultAdminPassword()),
+			},
 		},
 	}
 }
@@ -201,6 +205,10 @@ func (s *Server) loadState() error {
 	if state.NextHistoryID < 1 {
 		state.NextHistoryID = 1
 	}
+	if state.Settings.Security.PasswordHash == "" {
+		state.Settings.Security.PasswordHash = hashPassword(defaultAdminPassword())
+		state.Settings.Security.Enabled = true
+	}
 	s.state = state
 	return nil
 }
@@ -241,6 +249,10 @@ func getenv(key, fallback string) string {
 	return value
 }
 
+func defaultAdminPassword() string {
+	return getenv("QIANGDAO_DEFAULT_PASSWORD", "admin123456")
+}
+
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -268,7 +280,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	password := strings.TrimSpace(r.FormValue("password"))
 	if !s.checkPassword(password) {
-		s.render(w, "login.html", map[string]any{"Error": "Invalid password"})
+		s.render(w, "login.html", map[string]any{"Error": "密码错误"})
 		return
 	}
 	token := randomToken(32)
@@ -662,7 +674,7 @@ func (s *Server) handleSecuritySettings(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	if payload.Password != "" && len(payload.Password) < 6 {
-		writeJSON(w, http.StatusBadRequest, APIResponse{Success: false, Error: "password must be at least 6 chars"})
+		writeJSON(w, http.StatusBadRequest, APIResponse{Success: false, Error: "密码长度至少为 6 位"})
 		return
 	}
 

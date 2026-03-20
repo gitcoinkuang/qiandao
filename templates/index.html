@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,206 +7,288 @@
     <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-    <div class="page">
-        <section class="hero card">
-            <div>
-                <span class="eyebrow">QianDao V2</span>
-                <h1>Self-hosted sign-in control panel rebuilt for Docker-first workflows.</h1>
-                <p>Modern task management, concurrent execution, scheduler control, notifications, and a cleaner interface in a single lightweight Go service.</p>
-            </div>
-            <div class="hero-actions">
-                <button class="primary" id="runAllBtn">Run all enabled tasks</button>
-                <button class="secondary" id="refreshBtn">Refresh</button>
-                <a class="ghost button-link" href="/logout">Logout</a>
-            </div>
-        </section>
-
-        <section id="message" class="message hidden"></section>
-
-        <section class="summary-grid" id="summaryGrid"></section>
-
-        <section class="layout">
-            <div class="column">
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2>Tasks</h2>
-                            <p>Create, edit, run, and review each task from one place.</p>
-                        </div>
-                        <button class="secondary" id="newTaskBtn">New task</button>
-                    </div>
-                    <div id="taskList" class="task-list"></div>
-                </div>
-
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2>History</h2>
-                            <p>The newest run results appear first.</p>
-                        </div>
-                        <button class="danger" id="clearHistoryBtn">Clear history</button>
-                    </div>
-                    <div id="historyList" class="history-list"></div>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">Q</div>
+                <div>
+                    <strong>QianDao V2</strong>
+                    <span>&#x7B7E;&#x5230;&#x63A7;&#x5236;&#x53F0;</span>
                 </div>
             </div>
 
-            <div class="column">
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2 id="taskFormTitle">Create task</h2>
-                            <p>Curl import is supported, but direct editing stays available.</p>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <label class="field">
-                            <span>Name</span>
-                            <input id="taskName" placeholder="Community daily sign-in">
-                        </label>
-                        <label class="field">
-                            <span>Method</span>
-                            <select id="taskMethod">
-                                <option>GET</option>
-                                <option>POST</option>
-                                <option>PUT</option>
-                                <option>PATCH</option>
-                                <option>DELETE</option>
-                            </select>
-                        </label>
-                        <label class="field span-2">
-                            <span>Curl command</span>
-                            <textarea id="taskCurl" placeholder="Paste a curl command here."></textarea>
-                        </label>
-                        <label class="field span-2">
-                            <span>URL</span>
-                            <input id="taskURL" placeholder="https://example.com/signin">
-                        </label>
-                        <label class="field span-2">
-                            <span>Headers (JSON)</span>
-                            <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
-                        </label>
-                        <label class="field span-2">
-                            <span>Body</span>
-                            <textarea id="taskBody" placeholder="Optional request body"></textarea>
-                        </label>
-                        <label class="field">
-                            <span>Timeout seconds</span>
-                            <input id="taskTimeout" type="number" min="1" max="120" value="30">
-                        </label>
-                        <label class="field">
-                            <span>Retry count</span>
-                            <input id="taskRetry" type="number" min="0" max="5" value="0">
-                        </label>
-                        <label class="field">
-                            <span>Success keywords</span>
-                            <input id="taskSuccessKeywords" placeholder="success, signed in">
-                        </label>
-                        <label class="field">
-                            <span>Failure keywords</span>
-                            <input id="taskFailureKeywords" placeholder="error, expired">
-                        </label>
-                        <label class="field">
-                            <span>Task hour</span>
-                            <input id="taskHour" type="number" min="0" max="23" value="8">
-                        </label>
-                        <label class="field">
-                            <span>Task minute</span>
-                            <input id="taskMinute" type="number" min="0" max="59" value="0">
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <label><input id="taskEnabled" type="checkbox" checked> Enabled</label>
-                        <label><input id="taskScheduleEnabled" type="checkbox"> Use per-task schedule</label>
-                    </div>
-                    <div class="button-row">
-                        <button class="secondary" id="parseCurlBtn">Parse curl</button>
-                        <button class="primary" id="saveTaskBtn">Save task</button>
-                        <button class="ghost" id="resetTaskBtn">Reset</button>
-                    </div>
-                    <pre id="taskPreview" class="preview">Parsed task details will appear here.</pre>
-                </div>
+            <nav class="nav-list">
+                <button class="nav-item nav-item-active" type="button">&#x603B;&#x89C8;</button>
+                <button class="nav-item" type="button" id="newTaskBtn">&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;</button>
+                <button class="nav-item" type="button" id="refreshBtn">&#x5237;&#x65B0;&#x6570;&#x636E;</button>
+                <button class="nav-item" type="button" id="runAllBtn">&#x8FD0;&#x884C;&#x5168;&#x90E8;</button>
+            </nav>
 
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2>Global schedule</h2>
-                            <p>Tasks without a per-task schedule fall back to this timer.</p>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <label class="field">
-                            <span>Hour</span>
-                            <input id="scheduleHour" type="number" min="0" max="23">
-                        </label>
-                        <label class="field">
-                            <span>Minute</span>
-                            <input id="scheduleMinute" type="number" min="0" max="59">
-                        </label>
-                        <label class="field span-2">
-                            <span>Parallel workers</span>
-                            <input id="scheduleWorkers" type="number" min="1" max="8">
-                        </label>
-                    </div>
-                    <div class="toggle-row">
-                        <label><input id="scheduleEnabled" type="checkbox"> Enable global schedule</label>
-                    </div>
-                    <div class="button-row">
-                        <button class="primary" id="saveScheduleBtn">Save schedule</button>
-                        <button class="secondary" id="checkScheduleBtn">Check now</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2>Notifications</h2>
-                            <p>Telegram and generic webhook are available.</p>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <label class="field">
-                            <span>Telegram bot token</span>
-                            <input id="telegramBotToken">
-                        </label>
-                        <label class="field">
-                            <span>Telegram chat ID</span>
-                            <input id="telegramChatID">
-                        </label>
-                        <label class="field span-2">
-                            <span>Webhook URL</span>
-                            <input id="webhookURL" placeholder="https://example.com/webhook">
-                        </label>
-                    </div>
-                    <div class="toggle-row stacked">
-                        <label><input id="telegramEnabled" type="checkbox"> Enable Telegram</label>
-                        <label><input id="webhookEnabled" type="checkbox"> Enable webhook</label>
-                        <label><input id="notifyOnSuccess" type="checkbox"> Notify on success</label>
-                        <label><input id="notifyOnFailure" type="checkbox"> Notify on failure</label>
-                    </div>
-                    <div class="button-row">
-                        <button class="primary" id="saveNotifyBtn">Save notifications</button>
-                        <button class="secondary" id="testNotifyBtn">Send test</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="section-head">
-                        <div>
-                            <h2>Access protection</h2>
-                            <p>Optional login screen for shared deployments.</p>
-                        </div>
-                    </div>
-                    <label class="field">
-                        <span>New password</span>
-                        <input id="securityPassword" type="password" placeholder="At least 6 characters">
-                    </label>
-                    <div class="toggle-row">
-                        <label><input id="securityEnabled" type="checkbox"> Require login</label>
-                    </div>
-                    <button class="primary" id="saveSecurityBtn">Save security settings</button>
-                </div>
+            <div class="sidebar-note">
+                <span class="eyebrow">Docker First</span>
+                <p>&#x4E00;&#x5957;&#x9762;&#x5411;&#x957F;&#x671F;&#x8FD0;&#x884C;&#x548C;&#x81EA;&#x6258;&#x7BA1;&#x573A;&#x666F;&#x8BBE;&#x8BA1;&#x7684;&#x8F7B;&#x91CF;&#x63A7;&#x5236;&#x53F0;&#x3002;</p>
+                <a class="ghost button-link full-width" href="/logout">&#x9000;&#x51FA;&#x767B;&#x5F55;</a>
             </div>
-        </section>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <span class="eyebrow">Modern SaaS</span>
+                    <h1>&#x7B7E;&#x5230;&#x4EFB;&#x52A1;&#x3001;&#x8C03;&#x5EA6;&#x548C;&#x901A;&#x77E5;&#x90FD;&#x96C6;&#x4E2D;&#x5728;&#x4E00;&#x4E2A;&#x5DE5;&#x4F5C;&#x53F0;&#x91CC;</h1>
+                    <p>&#x8FD9;&#x7248;&#x754C;&#x9762;&#x4EE5;&#x201C;&#x603B;&#x89C8;&#x5148;&#x884C;&#x201D;&#x4E3A;&#x6838;&#x5FC3;&#xFF0C;&#x8BA9;&#x4F60;&#x5148;&#x770B;&#x5230;&#x72B6;&#x6001;&#x3001;&#x6307;&#x6807;&#x548C;&#x98CE;&#x9669;&#xFF0C;&#x518D;&#x8FDB;&#x5165;&#x4EFB;&#x52A1;&#x7F16;&#x8F91;&#x548C;&#x8FD0;&#x884C;&#x64CD;&#x4F5C;&#x3002;</p>
+                </div>
+                <div class="topbar-actions">
+                    <button class="secondary" id="checkScheduleBtn">&#x7ACB;&#x5373;&#x68C0;&#x67E5;&#x8C03;&#x5EA6;</button>
+                    <button class="primary" id="parseCurlBtn">&#x89E3;&#x6790; Curl</button>
+                </div>
+            </header>
+
+            <section id="message" class="message hidden"></section>
+
+            <section class="hero-grid">
+                <div class="hero-card primary-hero">
+                    <div class="hero-copy">
+                        <span class="eyebrow">&#x8FD0;&#x884C;&#x6001;&#x52BF;</span>
+                        <h2>&#x628A;&#x65E5;&#x5E38;&#x7B7E;&#x5230;&#x53D8;&#x6210;&#x53EF;&#x89C2;&#x5BDF;&#x3001;&#x53EF;&#x7EF4;&#x62A4;&#x7684;&#x81EA;&#x52A8;&#x5316;&#x4EFB;&#x52A1;</h2>
+                        <p>&#x5728;&#x8FD9;&#x91CC;&#x5FEB;&#x901F;&#x770B;&#x5230;&#x6210;&#x529F;&#x7387;&#x3001;&#x5F02;&#x5E38;&#x4EFB;&#x52A1;&#x3001;&#x6267;&#x884C;&#x8017;&#x65F6;&#x548C;&#x6700;&#x8FD1;&#x6D3B;&#x52A8;&#xFF0C;&#x7B2C;&#x4E00;&#x773C;&#x5C31;&#x77E5;&#x9053;&#x7CFB;&#x7EDF;&#x662F;&#x5426;&#x5065;&#x5EB7;&#x3002;</p>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="primary" id="saveTaskBtn">&#x4FDD;&#x5B58;&#x5F53;&#x524D;&#x4EFB;&#x52A1;</button>
+                        <button class="ghost" id="resetTaskBtn">&#x91CD;&#x7F6E;&#x8868;&#x5355;</button>
+                    </div>
+                </div>
+
+                <div class="hero-card side-hero">
+                    <div class="section-mini">
+                        <span>&#x8FD9;&#x4E00;&#x7248;&#x98CE;&#x683C;</span>
+                        <strong>Modern SaaS</strong>
+                    </div>
+                    <div class="section-mini">
+                        <span>&#x9ED8;&#x8BA4;&#x90E8;&#x7F72;&#x65B9;&#x5F0F;</span>
+                        <strong>Docker / Compose</strong>
+                    </div>
+                    <div class="section-mini">
+                        <span>&#x8BBF;&#x95EE;&#x7B56;&#x7565;</span>
+                        <strong>&#x9ED8;&#x8BA4;&#x767B;&#x5F55;&#x4FDD;&#x62A4;</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="summary-grid" id="summaryGrid"></section>
+
+            <section class="insight-grid">
+                <section class="panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>&#x8FD0;&#x884C;&#x5206;&#x5E03;</h2>
+                            <p>&#x4ECE;&#x6700;&#x8FD1;&#x8FD0;&#x884C;&#x8BB0;&#x5F55;&#x4E2D;&#x63D0;&#x53D6;&#x7684;&#x6210;&#x529F;&#x3001;&#x5931;&#x8D25;&#x548C;&#x5E73;&#x5747;&#x8017;&#x65F6;&#x6982;&#x89C8;&#x3002;</p>
+                        </div>
+                    </div>
+                    <div id="healthBars" class="health-bars"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="section-head">
+                        <div>
+                            <h2>&#x8FD1;&#x671F;&#x70ED;&#x70B9;</h2>
+                            <p>&#x4F18;&#x5148;&#x6D4F;&#x89C8;&#x6700;&#x8FD1;&#x8FD0;&#x884C;&#x7684;&#x4EFB;&#x52A1;&#x3001;&#x5931;&#x8D25;&#x72B6;&#x6001;&#x548C;&#x5F02;&#x5E38;&#x4FE1;&#x53F7;&#x3002;</p>
+                        </div>
+                    </div>
+                    <div id="activityFeed" class="activity-feed"></div>
+                </section>
+            </section>
+
+            <section class="main-grid">
+                <div class="left-column">
+                    <section class="panel panel-tall">
+                        <div class="section-head">
+                            <div>
+                                <h2>&#x4EFB;&#x52A1;&#x4E2D;&#x5FC3;</h2>
+                                <p>&#x67E5;&#x770B;&#x6240;&#x6709;&#x4EFB;&#x52A1;&#x72B6;&#x6001;&#x3001;&#x5FEB;&#x901F;&#x8FD0;&#x884C;&#x5E76;&#x53CA;&#x65F6;&#x5904;&#x7406;&#x5931;&#x8D25;&#x4EFB;&#x52A1;&#x3002;</p>
+                            </div>
+                        </div>
+
+                        <div class="toolbar">
+                            <label class="toolbar-field search-field">
+                                <span>&#x641C;&#x7D22;</span>
+                                <input id="taskSearch" placeholder="&#x641C;&#x7D22;&#x4EFB;&#x52A1;&#x540D;&#x79F0;&#x6216; URL">
+                            </label>
+                            <div class="filter-group" id="statusFilters">
+                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">&#x5168;&#x90E8;</button>
+                                <button class="filter-chip" data-filter="success" type="button">&#x6210;&#x529F;</button>
+                                <button class="filter-chip" data-filter="failed" type="button">&#x5931;&#x8D25;</button>
+                                <button class="filter-chip" data-filter="idle" type="button">&#x7A7A;&#x95F2;</button>
+                            </div>
+                        </div>
+
+                        <div id="taskList" class="task-list"></div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="section-head">
+                            <div>
+                                <h2>&#x6267;&#x884C;&#x65F6;&#x95F4;&#x7EBF;</h2>
+                                <p>&#x6700;&#x8FD1;&#x7684;&#x6267;&#x884C;&#x8BB0;&#x5F55;&#x6309;&#x65F6;&#x95F4;&#x5012;&#x5E8F;&#x663E;&#x793A;&#xFF0C;&#x4FBF;&#x4E8E;&#x6392;&#x67E5;&#x5F02;&#x5E38;&#x3002;</p>
+                            </div>
+                            <button class="danger" id="clearHistoryBtn">&#x6E05;&#x7A7A;&#x5386;&#x53F2;</button>
+                        </div>
+                        <div id="historyList" class="history-list"></div>
+                    </section>
+                </div>
+
+                <div class="right-column">
+                    <section class="panel">
+                        <div class="section-head">
+                            <div>
+                                <h2 id="taskFormTitle">&#x521B;&#x5EFA;&#x4EFB;&#x52A1;</h2>
+                                <p>&#x652F;&#x6301;&#x5BFC;&#x5165; Curl&#xFF0C;&#x4E5F;&#x652F;&#x6301;&#x624B;&#x52A8;&#x4FEE;&#x6539; URL&#x3001;&#x8BF7;&#x6C42;&#x5934;&#x3001;&#x8BF7;&#x6C42;&#x4F53;&#x548C;&#x6267;&#x884C;&#x89C4;&#x5219;&#x3002;</p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>&#x4EFB;&#x52A1;&#x540D;&#x79F0;</span>
+                                <input id="taskName" placeholder="&#x4F8B;&#x5982;&#xFF1A;&#x793E;&#x533A;&#x6BCF;&#x65E5;&#x7B7E;&#x5230;">
+                            </label>
+                            <label class="field">
+                                <span>&#x8BF7;&#x6C42;&#x65B9;&#x6CD5;</span>
+                                <select id="taskMethod">
+                                    <option>GET</option>
+                                    <option>POST</option>
+                                    <option>PUT</option>
+                                    <option>PATCH</option>
+                                    <option>DELETE</option>
+                                </select>
+                            </label>
+                            <label class="field span-2">
+                                <span>Curl &#x547D;&#x4EE4;</span>
+                                <textarea id="taskCurl" placeholder="&#x628A;&#x5B8C;&#x6574;&#x7684; curl &#x547D;&#x4EE4;&#x7C98;&#x8D34;&#x5230;&#x8FD9;&#x91CC;&#x3002;"></textarea>
+                            </label>
+                            <label class="field span-2">
+                                <span>&#x8BF7;&#x6C42;&#x5730;&#x5740;</span>
+                                <input id="taskURL" placeholder="https://example.com/signin">
+                            </label>
+                            <label class="field span-2">
+                                <span>&#x8BF7;&#x6C42;&#x5934;&#xFF08;JSON&#xFF09;</span>
+                                <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
+                            </label>
+                            <label class="field span-2">
+                                <span>&#x8BF7;&#x6C42;&#x4F53;</span>
+                                <textarea id="taskBody" placeholder="&#x53EF;&#x9009;&#x7684;&#x8BF7;&#x6C42;&#x4F53;&#x5185;&#x5BB9;"></textarea>
+                            </label>
+                            <label class="field">
+                                <span>&#x8D85;&#x65F6;&#x79D2;&#x6570;</span>
+                                <input id="taskTimeout" type="number" min="1" max="120" value="30">
+                            </label>
+                            <label class="field">
+                                <span>&#x91CD;&#x8BD5;&#x6B21;&#x6570;</span>
+                                <input id="taskRetry" type="number" min="0" max="5" value="0">
+                            </label>
+                            <label class="field">
+                                <span>&#x6210;&#x529F;&#x5173;&#x952E;&#x8BCD;</span>
+                                <input id="taskSuccessKeywords" placeholder="success, &#x7B7E;&#x5230;&#x6210;&#x529F;">
+                            </label>
+                            <label class="field">
+                                <span>&#x5931;&#x8D25;&#x5173;&#x952E;&#x8BCD;</span>
+                                <input id="taskFailureKeywords" placeholder="error, &#x5931;&#x8D25;, &#x8FC7;&#x671F;">
+                            </label>
+                            <label class="field">
+                                <span>&#x5355;&#x4EFB;&#x52A1;&#x5C0F;&#x65F6;</span>
+                                <input id="taskHour" type="number" min="0" max="23" value="8">
+                            </label>
+                            <label class="field">
+                                <span>&#x5355;&#x4EFB;&#x52A1;&#x5206;&#x949F;</span>
+                                <input id="taskMinute" type="number" min="0" max="59" value="0">
+                            </label>
+                        </div>
+
+                        <div class="toggle-row">
+                            <label><input id="taskEnabled" type="checkbox" checked> &#x542F;&#x7528;&#x4EFB;&#x52A1;</label>
+                            <label><input id="taskScheduleEnabled" type="checkbox"> &#x4F7F;&#x7528;&#x5355;&#x4EFB;&#x52A1;&#x5B9A;&#x65F6;</label>
+                        </div>
+
+                        <pre id="taskPreview" class="preview">&#x8FD9;&#x91CC;&#x4F1A;&#x663E;&#x793A;&#x89E3;&#x6790;&#x7ED3;&#x679C;&#x6216;&#x5F53;&#x524D;&#x4EFB;&#x52A1;&#x7684;&#x8BE6;&#x7EC6;&#x4FE1;&#x606F;&#x3002;</pre>
+                    </section>
+
+                    <section class="panel">
+                        <div class="section-head">
+                            <div>
+                                <h2>&#x8C03;&#x5EA6;&#x4E0E;&#x901A;&#x77E5;</h2>
+                                <p>&#x628A;&#x5468;&#x671F;&#x6267;&#x884C;&#x548C;&#x5916;&#x90E8;&#x901A;&#x77E5;&#x653E;&#x5728;&#x540C;&#x4E00;&#x4E2A;&#x8BBE;&#x7F6E;&#x533A;&#xFF0C;&#x51CF;&#x5C11;&#x6765;&#x56DE;&#x5207;&#x6362;&#x3002;</p>
+                            </div>
+                        </div>
+
+                        <div class="stack-card">
+                            <h3>&#x5168;&#x5C40;&#x5B9A;&#x65F6;</h3>
+                            <div class="form-grid compact-grid">
+                                <label class="field">
+                                    <span>&#x5C0F;&#x65F6;</span>
+                                    <input id="scheduleHour" type="number" min="0" max="23">
+                                </label>
+                                <label class="field">
+                                    <span>&#x5206;&#x949F;</span>
+                                    <input id="scheduleMinute" type="number" min="0" max="59">
+                                </label>
+                                <label class="field span-2">
+                                    <span>&#x5E76;&#x53D1;&#x6267;&#x884C;&#x6570;</span>
+                                    <input id="scheduleWorkers" type="number" min="1" max="8">
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <label><input id="scheduleEnabled" type="checkbox"> &#x542F;&#x7528;&#x5168;&#x5C40;&#x5B9A;&#x65F6;</label>
+                            </div>
+                            <button class="secondary full-width" id="saveScheduleBtn">&#x4FDD;&#x5B58;&#x5B9A;&#x65F6;&#x8BBE;&#x7F6E;</button>
+                        </div>
+
+                        <div class="stack-card">
+                            <h3>&#x901A;&#x77E5;&#x8BBE;&#x7F6E;</h3>
+                            <div class="form-grid compact-grid">
+                                <label class="field">
+                                    <span>Telegram Bot Token</span>
+                                    <input id="telegramBotToken">
+                                </label>
+                                <label class="field">
+                                    <span>Telegram Chat ID</span>
+                                    <input id="telegramChatID">
+                                </label>
+                                <label class="field span-2">
+                                    <span>Webhook &#x5730;&#x5740;</span>
+                                    <input id="webhookURL" placeholder="https://example.com/webhook">
+                                </label>
+                            </div>
+                            <div class="toggle-grid">
+                                <label><input id="telegramEnabled" type="checkbox"> &#x542F;&#x7528; Telegram</label>
+                                <label><input id="webhookEnabled" type="checkbox"> &#x542F;&#x7528; Webhook</label>
+                                <label><input id="notifyOnSuccess" type="checkbox"> &#x6210;&#x529F;&#x65F6;&#x901A;&#x77E5;</label>
+                                <label><input id="notifyOnFailure" type="checkbox"> &#x5931;&#x8D25;&#x65F6;&#x901A;&#x77E5;</label>
+                            </div>
+                            <div class="button-row">
+                                <button class="secondary" id="saveNotifyBtn">&#x4FDD;&#x5B58;&#x901A;&#x77E5;</button>
+                                <button class="ghost" id="testNotifyBtn">&#x53D1;&#x9001;&#x6D4B;&#x8BD5;&#x901A;&#x77E5;</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="panel">
+                        <div class="section-head">
+                            <div>
+                                <h2>&#x5B89;&#x5168;&#x8BBE;&#x7F6E;</h2>
+                                <p>&#x9ED8;&#x8BA4;&#x5F00;&#x542F;&#x767B;&#x5F55;&#x4FDD;&#x62A4;&#x3002;&#x4F60;&#x53EF;&#x4EE5;&#x5728;&#x8FD9;&#x91CC;&#x4FEE;&#x6539;&#x5BC6;&#x7801;&#x6216;&#x5207;&#x6362;&#x4FDD;&#x62A4;&#x5F00;&#x5173;&#x3002;</p>
+                            </div>
+                        </div>
+                        <label class="field">
+                            <span>&#x65B0;&#x5BC6;&#x7801;</span>
+                            <input id="securityPassword" type="password" placeholder="&#x81F3;&#x5C11; 6 &#x4F4D;">
+                        </label>
+                        <div class="toggle-row">
+                            <label><input id="securityEnabled" type="checkbox"> &#x542F;&#x7528;&#x767B;&#x5F55;&#x4FDD;&#x62A4;</label>
+                        </div>
+                        <button class="primary full-width" id="saveSecurityBtn">&#x4FDD;&#x5B58;&#x5B89;&#x5168;&#x8BBE;&#x7F6E;</button>
+                    </section>
+                </div>
+            </section>
+        </main>
     </div>
 
     <script src="/static/app.js"></script>
