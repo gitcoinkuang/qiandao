@@ -20,7 +20,10 @@ import (
 	"strings"
 	"sync"
 	"time"
+	_ "time/tzdata"
 )
+
+var appLocation = mustLoadLocation(getenv("APP_TIMEZONE", "Asia/Shanghai"))
 
 type Task struct {
 	ID              int               `json:"id"`
@@ -142,7 +145,21 @@ func defaultState() AppState {
 }
 
 func nowString() string {
-	return time.Now().Format("2006-01-02 15:04:05")
+	return appNow().Format("2006-01-02 15:04:05")
+}
+
+func appNow() time.Time {
+	return time.Now().In(appLocation)
+}
+
+func mustLoadLocation(name string) *time.Location {
+	loc, err := time.LoadLocation(strings.TrimSpace(name))
+	if err != nil {
+		log.Printf("invalid APP_TIMEZONE %q, fallback to Asia/Shanghai", name)
+		loc, _ = time.LoadLocation("Asia/Shanghai")
+		return loc
+	}
+	return loc
 }
 
 func main() {
@@ -285,7 +302,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	token := randomToken(32)
 	s.sessionMu.Lock()
-	s.sessions[token] = time.Now().Add(7 * 24 * time.Hour)
+	s.sessions[token] = appNow().Add(7 * 24 * time.Hour)
 	s.sessionMu.Unlock()
 	http.SetCookie(w, &http.Cookie{
 		Name:     "qiandao_session",
@@ -331,7 +348,7 @@ func (s *Server) isAuthenticated(r *http.Request) bool {
 	s.sessionMu.Lock()
 	defer s.sessionMu.Unlock()
 	expiresAt, ok := s.sessions[cookie.Value]
-	if !ok || time.Now().After(expiresAt) {
+	if !ok || appNow().After(expiresAt) {
 		delete(s.sessions, cookie.Value)
 		return false
 	}
@@ -350,7 +367,7 @@ func (s *Server) checkPassword(password string) bool {
 func randomToken(length int) string {
 	buf := make([]byte, length)
 	if _, err := rand.Read(buf); err != nil {
-		return fmt.Sprintf("%d", time.Now().UnixNano())
+		return fmt.Sprintf("%d", appNow().UnixNano())
 	}
 	return hex.EncodeToString(buf)
 }
@@ -652,7 +669,7 @@ func (s *Server) handleScheduleCheck(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusMethodNotAllowed, APIResponse{Success: false, Error: "method not allowed"})
 		return
 	}
-	results := s.runScheduledTasks(time.Now(), "manual-schedule-check")
+	results := s.runScheduledTasks(appNow(), "manual-schedule-check")
 	writeJSON(w, http.StatusOK, APIResponse{Success: true, Results: results})
 }
 
@@ -946,7 +963,7 @@ func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
 	var durationMS int
 
 	for attempt := 0; attempt <= task.RetryCount; attempt++ {
-		started := time.Now()
+		started := appNow()
 		req, err := http.NewRequest(task.Method, task.URL, strings.NewReader(task.Body))
 		if err != nil {
 			lastMessage = err.Error()
@@ -1069,7 +1086,7 @@ func (s *Server) schedulerLoop() {
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
 	for range ticker.C {
-		s.runScheduledTasks(time.Now(), "schedule")
+		s.runScheduledTasks(appNow(), "schedule")
 	}
 }
 

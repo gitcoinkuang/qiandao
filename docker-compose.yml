@@ -4,6 +4,9 @@ services:
   qiandao:
     build: .
     container_name: qiandao-v2
+    environment:
+      - TZ=Asia/Shanghai
+      - APP_TIMEZONE=Asia/Shanghai
     ports:
       - "8080:8080"
     volumes:
