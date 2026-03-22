@@ -60,6 +60,8 @@ const TEXT = {
     healthNoData: "\u6682\u65e0\u8fd0\u884c\u6570\u636e",
     recentFeedEmpty: "\u6682\u65e0\u8fd1\u671f\u6d3b\u52a8",
     taskSchedulePrefix: "\u5355\u4efb\u52a1 ",
+    aggressiveMode: "\u62a2\u96f6\u70b9\u6a21\u5f0f",
+    requestStartedAt: "\u53d1\u8d77\u65f6\u95f4",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -189,6 +191,7 @@ function renderTasks(tasks) {
                 <span class="pill">${task.schedule_enabled ? `${TEXT.taskSchedulePrefix}${pad(task.schedule_hour)}:${pad(task.schedule_minute)}` : TEXT.globalSchedule}</span>
                 <span class="pill">${TEXT.timeout} ${task.timeout_seconds}s</span>
                 <span class="pill">${TEXT.retry} ${task.retry_count}</span>
+                ${task.aggressive_mode ? `<span class="pill">${TEXT.aggressiveMode}</span>` : ""}
             </div>
 
             <div class="meta">
@@ -223,6 +226,7 @@ function renderHistory(history) {
                 <span class="status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
             </div>
             <div class="meta">${TEXT.statusCode}\uFF1A${item.status_code || 0} / ${TEXT.duration}\uFF1A${item.response_time_ms || 0} ms</div>
+            <div class="meta">${TEXT.requestStartedAt}\uFF1A${escapeHTML(item.request_started_at || "-")}</div>
             <div class="meta">${escapeHTML(item.message || "")}</div>
             <pre class="history-preview">${escapeHTML(item.response_preview || "")}</pre>
         </div>
@@ -323,6 +327,7 @@ function getTaskPayload() {
         curl_command: $("taskCurl").value.trim(),
         enabled: $("taskEnabled").checked,
         schedule_enabled: $("taskScheduleEnabled").checked,
+        aggressive_mode: $("taskAggressiveMode").checked,
         schedule_hour: Number($("taskHour").value),
         schedule_minute: Number($("taskMinute").value),
         timeout_seconds: Number($("taskTimeout").value),
@@ -372,6 +377,7 @@ function editTask(id) {
     $("taskCurl").value = task.curl_command || "";
     $("taskEnabled").checked = !!task.enabled;
     $("taskScheduleEnabled").checked = !!task.schedule_enabled;
+    $("taskAggressiveMode").checked = !!task.aggressive_mode;
     $("taskHour").value = task.schedule_hour;
     $("taskMinute").value = task.schedule_minute;
     $("taskTimeout").value = task.timeout_seconds;
@@ -393,6 +399,7 @@ function resetTask(showToast = true) {
     $("taskCurl").value = "";
     $("taskEnabled").checked = true;
     $("taskScheduleEnabled").checked = false;
+    $("taskAggressiveMode").checked = false;
     $("taskHour").value = 8;
     $("taskMinute").value = 0;
     $("taskTimeout").value = 30;

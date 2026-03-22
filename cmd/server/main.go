@@ -39,6 +39,7 @@ type Task struct {
 	ScheduleMinute  int               `json:"schedule_minute"`
 	TimeoutSeconds  int               `json:"timeout_seconds"`
 	RetryCount      int               `json:"retry_count"`
+	AggressiveMode  bool              `json:"aggressive_mode"`
 	SuccessKeywords string            `json:"success_keywords"`
 	FailureKeywords string            `json:"failure_keywords"`
 	LastStatus      string            `json:"last_status"`
@@ -57,6 +58,7 @@ type HistoryItem struct {
 	Message         string `json:"message"`
 	ResponsePreview string `json:"response_preview"`
 	ResponseTimeMS  int    `json:"response_time_ms"`
+	RequestStartedAt string `json:"request_started_at"`
 	TriggeredBy     string `json:"triggered_by"`
 	CreatedAt       string `json:"created_at"`
 }
@@ -103,6 +105,7 @@ type Server struct {
 	statePath   string
 	templates   *template.Template
 	httpClient  *http.Client
+	transport   *http.Transport
 	sessionMu   sync.Mutex
 	sessions    map[string]time.Time
 	scheduleMu  sync.Mutex
@@ -120,6 +123,13 @@ type APIResponse struct {
 	Config  interface{} `json:"config,omitempty"`
 	History interface{} `json:"history,omitempty"`
 }
+
+const (
+	scheduleTickInterval    = time.Second
+	scheduleTriggerWindow   = 3 * time.Second
+	scheduledBurstRetries   = 3
+	scheduledBurstInterval  = 250 * time.Millisecond
+)
 
 func defaultState() AppState {
 	return AppState{
@@ -186,6 +196,16 @@ func newServer() (*Server, error) {
 		statePath:   statePath,
 		templates:   tmpl,
 		httpClient:  &http.Client{Timeout: 30 * time.Second},
+		transport: &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			MaxIdleConns:          128,
+			MaxIdleConnsPerHost:   32,
+			MaxConnsPerHost:       64,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   5 * time.Second,
+			ExpectContinueTimeout: time.Second,
+			ForceAttemptHTTP2:     true,
+		},
 		sessions:    map[string]time.Time{},
 		scheduleRan: map[string]struct{}{},
 	}
@@ -626,6 +646,7 @@ func (s *Server) handleNotifyTest(w http.ResponseWriter, r *http.Request) {
 		Message:         "This is a test notification from QianDao V2.",
 		ResponsePreview: "Notification pipeline is working.",
 		ResponseTimeMS:  42,
+		RequestStartedAt: nowString(),
 		TriggeredBy:     "manual",
 		CreatedAt:       nowString(),
 	}
@@ -955,15 +976,25 @@ func (s *Server) runAllEnabledTasks(triggeredBy string) []HistoryItem {
 }
 
 func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
-	client := &http.Client{Timeout: time.Duration(task.TimeoutSeconds) * time.Second}
+	client := &http.Client{
+		Timeout:   time.Duration(task.TimeoutSeconds) * time.Second,
+		Transport: s.transport,
+	}
 	var result HistoryItem
 	var lastMessage string
 	var lastStatusCode int
 	var preview string
 	var durationMS int
+	var lastRequestStartedAt string
+	maxAttempts := task.RetryCount + 1
+	if shouldUseBurstMode(task, triggeredBy) && maxAttempts < scheduledBurstRetries+1 {
+		maxAttempts = scheduledBurstRetries + 1
+	}
 
-	for attempt := 0; attempt <= task.RetryCount; attempt++ {
+	for attempt := 0; attempt < maxAttempts; attempt++ {
 		started := appNow()
+		requestStartedAt := started.Format("2006-01-02 15:04:05.000")
+		lastRequestStartedAt = requestStartedAt
 		req, err := http.NewRequest(task.Method, task.URL, strings.NewReader(task.Body))
 		if err != nil {
 			lastMessage = err.Error()
@@ -996,14 +1027,15 @@ func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
 				Message:         "request completed",
 				ResponsePreview: preview,
 				ResponseTimeMS:  durationMS,
+				RequestStartedAt: requestStartedAt,
 				TriggeredBy:     triggeredBy,
 				CreatedAt:       nowString(),
 			}
 			s.finishRun(task.ID, result)
 			return result
 		}
-		if attempt < task.RetryCount {
-			time.Sleep(time.Duration(attempt+1) * time.Second)
+		if attempt < maxAttempts-1 {
+			time.Sleep(retryDelay(task, attempt, triggeredBy))
 		}
 	}
 
@@ -1015,11 +1047,26 @@ func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
 		Message:         lastMessage,
 		ResponsePreview: preview,
 		ResponseTimeMS:  durationMS,
+		RequestStartedAt: lastRequestStartedAt,
 		TriggeredBy:     triggeredBy,
 		CreatedAt:       nowString(),
 	}
 	s.finishRun(task.ID, result)
 	return result
+}
+
+func shouldUseBurstMode(task Task, triggeredBy string) bool {
+	if !task.AggressiveMode {
+		return false
+	}
+	return triggeredBy == "schedule" || triggeredBy == "manual-schedule-check"
+}
+
+func retryDelay(task Task, attempt int, triggeredBy string) time.Duration {
+	if shouldUseBurstMode(task, triggeredBy) && attempt < scheduledBurstRetries {
+		return scheduledBurstInterval
+	}
+	return time.Duration(attempt+1) * time.Second
 }
 
 func evaluateResponse(task Task, statusCode int, body string) string {
@@ -1083,10 +1130,14 @@ func (s *Server) finishRun(taskID int, item HistoryItem) {
 }
 
 func (s *Server) schedulerLoop() {
-	ticker := time.NewTicker(15 * time.Second)
+	now := appNow()
+	nextTick := now.Truncate(scheduleTickInterval).Add(scheduleTickInterval)
+	time.Sleep(time.Until(nextTick))
+
+	ticker := time.NewTicker(scheduleTickInterval)
 	defer ticker.Stop()
-	for range ticker.C {
-		s.runScheduledTasks(appNow(), "schedule")
+	for tickAt := range ticker.C {
+		s.runScheduledTasks(tickAt.In(appLocation), "schedule")
 	}
 }
 
@@ -1107,7 +1158,10 @@ func (s *Server) runScheduledTasks(now time.Time, triggeredBy string) []HistoryI
 			hour, minute = task.ScheduleHour, task.ScheduleMinute
 			shouldRun = true
 		}
-		if shouldRun && now.Hour() == hour && now.Minute() == minute {
+		if shouldRun &&
+			now.Hour() == hour &&
+			now.Minute() == minute &&
+			now.Second() < int(scheduleTriggerWindow/time.Second) {
 			runKey := fmt.Sprintf("%d:%s", task.ID, currentKey)
 			s.scheduleMu.Lock()
 			if _, ok := s.scheduleRan[runKey]; !ok {
