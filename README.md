@@ -1,6 +1,6 @@
 # QianDao V2
 
-一个面向 Docker 部署场景重写的自托管签到管理工具，支持保存任务、定时执行、通知推送，以及面向整点签到的抢零点优化。
+一个 Docker 部署的curl自动签到管理工具，支持保存任务、定时执行、通知推送，以及整点签到的抢零点优化。
 
 ## 技术栈
 
@@ -69,26 +69,10 @@ go run ./cmd/server
 ## Docker 运行
 
 ```bash
-docker compose up --build -d
+docker-compose up --build -d
 ```
 
 打开 [http://localhost:8080](http://localhost:8080)
-
-## 更新部署
-
-如果你已经部署在 VPS 上，更新代码后建议这样升级：
-
-```bash
-git pull
-docker compose down
-docker compose up --build -d
-```
-
-说明：
-
-- `git pull` 只会更新 Git 跟踪的文件
-- 如果你手动删除了受版本控制的文件，比如 `docker-compose.yml`，需要先用 `git restore docker-compose.yml` 恢复
-- 这次更新如果涉及 Go 代码或前端静态文件，记得使用 `--build`
 
 ## 数据目录
 
