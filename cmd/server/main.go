@@ -127,6 +127,7 @@ type APIResponse struct {
 const (
 	scheduleTickInterval    = time.Second
 	scheduleTriggerWindow   = 3 * time.Second
+	aggressiveStartDelay    = 1 * time.Second
 	scheduledBurstRetries   = 3
 	scheduledBurstInterval  = 250 * time.Millisecond
 )
@@ -1069,6 +1070,20 @@ func retryDelay(task Task, attempt int, triggeredBy string) time.Duration {
 	return time.Duration(attempt+1) * time.Second
 }
 
+func shouldTriggerAt(task Task, now time.Time, hour, minute int) bool {
+	if now.Hour() != hour || now.Minute() != minute {
+		return false
+	}
+
+	second := time.Duration(now.Second()) * time.Second
+	if task.AggressiveMode {
+		return second >= aggressiveStartDelay &&
+			second < aggressiveStartDelay+scheduleTriggerWindow
+	}
+
+	return second < scheduleTriggerWindow
+}
+
 func evaluateResponse(task Task, statusCode int, body string) string {
 	if statusCode < 200 || statusCode >= 300 {
 		return fmt.Sprintf("http %d", statusCode)
@@ -1158,10 +1173,7 @@ func (s *Server) runScheduledTasks(now time.Time, triggeredBy string) []HistoryI
 			hour, minute = task.ScheduleHour, task.ScheduleMinute
 			shouldRun = true
 		}
-		if shouldRun &&
-			now.Hour() == hour &&
-			now.Minute() == minute &&
-			now.Second() < int(scheduleTriggerWindow/time.Second) {
+		if shouldRun && shouldTriggerAt(task, now, hour, minute) {
 			runKey := fmt.Sprintf("%d:%s", task.ID, currentKey)
 			s.scheduleMu.Lock()
 			if _, ok := s.scheduleRan[runKey]; !ok {
