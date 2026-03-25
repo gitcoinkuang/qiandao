@@ -37,6 +37,7 @@ type Task struct {
 	ScheduleEnabled bool              `json:"schedule_enabled"`
 	ScheduleHour    int               `json:"schedule_hour"`
 	ScheduleMinute  int               `json:"schedule_minute"`
+	ScheduleSecond  int               `json:"schedule_second"`
 	TimeoutSeconds  int               `json:"timeout_seconds"`
 	RetryCount      int               `json:"retry_count"`
 	AggressiveMode  bool              `json:"aggressive_mode"`
@@ -50,17 +51,17 @@ type Task struct {
 }
 
 type HistoryItem struct {
-	ID              int    `json:"id"`
-	TaskID          int    `json:"task_id"`
-	TaskName        string `json:"task_name"`
-	Status          string `json:"status"`
-	StatusCode      int    `json:"status_code"`
-	Message         string `json:"message"`
-	ResponsePreview string `json:"response_preview"`
-	ResponseTimeMS  int    `json:"response_time_ms"`
+	ID               int    `json:"id"`
+	TaskID           int    `json:"task_id"`
+	TaskName         string `json:"task_name"`
+	Status           string `json:"status"`
+	StatusCode       int    `json:"status_code"`
+	Message          string `json:"message"`
+	ResponsePreview  string `json:"response_preview"`
+	ResponseTimeMS   int    `json:"response_time_ms"`
 	RequestStartedAt string `json:"request_started_at"`
-	TriggeredBy     string `json:"triggered_by"`
-	CreatedAt       string `json:"created_at"`
+	TriggeredBy      string `json:"triggered_by"`
+	CreatedAt        string `json:"created_at"`
 }
 
 type NotifySettings struct {
@@ -77,6 +78,7 @@ type ScheduleSettings struct {
 	Enabled    bool `json:"enabled"`
 	Hour       int  `json:"hour"`
 	Minute     int  `json:"minute"`
+	Second     int  `json:"second"`
 	MaxWorkers int  `json:"max_workers"`
 }
 
@@ -125,11 +127,10 @@ type APIResponse struct {
 }
 
 const (
-	scheduleTickInterval    = time.Second
-	scheduleTriggerWindow   = 3 * time.Second
-	aggressiveStartDelay    = 1 * time.Second
-	scheduledBurstRetries   = 3
-	scheduledBurstInterval  = 250 * time.Millisecond
+	scheduleTickInterval   = time.Second
+	scheduleTriggerWindow  = 3 * time.Second
+	scheduledBurstRetries  = 3
+	scheduledBurstInterval = 250 * time.Millisecond
 )
 
 func defaultState() AppState {
@@ -145,6 +146,7 @@ func defaultState() AppState {
 			Schedule: ScheduleSettings{
 				Hour:       8,
 				Minute:     0,
+				Second:     0,
 				MaxWorkers: 4,
 			},
 			Security: SecuritySettings{
@@ -194,9 +196,9 @@ func newServer() (*Server, error) {
 
 	statePath := filepath.Join("data", "state.json")
 	s := &Server{
-		statePath:   statePath,
-		templates:   tmpl,
-		httpClient:  &http.Client{Timeout: 30 * time.Second},
+		statePath:  statePath,
+		templates:  tmpl,
+		httpClient: &http.Client{Timeout: 30 * time.Second},
 		transport: &http.Transport{
 			Proxy:                 http.ProxyFromEnvironment,
 			MaxIdleConns:          128,
@@ -641,15 +643,15 @@ func (s *Server) handleNotifyTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := HistoryItem{
-		TaskName:        "Notification test",
-		Status:          "success",
-		StatusCode:      200,
-		Message:         "This is a test notification from QianDao V2.",
-		ResponsePreview: "Notification pipeline is working.",
-		ResponseTimeMS:  42,
+		TaskName:         "Notification test",
+		Status:           "success",
+		StatusCode:       200,
+		Message:          "This is a test notification from QianDao V2.",
+		ResponsePreview:  "Notification pipeline is working.",
+		ResponseTimeMS:   42,
 		RequestStartedAt: nowString(),
-		TriggeredBy:     "manual",
-		CreatedAt:       nowString(),
+		TriggeredBy:      "manual",
+		CreatedAt:        nowString(),
 	}
 	s.sendNotifications(result)
 	writeJSON(w, http.StatusOK, APIResponse{Success: true})
@@ -665,7 +667,7 @@ func (s *Server) handleScheduleSettings(w http.ResponseWriter, r *http.Request) 
 		writeJSON(w, http.StatusBadRequest, APIResponse{Success: false, Error: err.Error()})
 		return
 	}
-	if config.Hour < 0 || config.Hour > 23 || config.Minute < 0 || config.Minute > 59 {
+	if config.Hour < 0 || config.Hour > 23 || config.Minute < 0 || config.Minute > 59 || config.Second < 0 || config.Second > 59 {
 		writeJSON(w, http.StatusBadRequest, APIResponse{Success: false, Error: "invalid schedule time"})
 		return
 	}
@@ -848,6 +850,9 @@ func normalizeTask(input Task) (Task, error) {
 	if task.ScheduleMinute < 0 || task.ScheduleMinute > 59 {
 		task.ScheduleMinute = 0
 	}
+	if task.ScheduleSecond < 0 || task.ScheduleSecond > 59 {
+		task.ScheduleSecond = 0
+	}
 	if task.CurlCommand == "" {
 		task.CurlCommand = buildCurl(task)
 	}
@@ -1021,16 +1026,16 @@ func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
 		lastMessage = evaluateResponse(task, resp.StatusCode, preview)
 		if lastMessage == "success" {
 			result = HistoryItem{
-				TaskID:          task.ID,
-				TaskName:        task.Name,
-				Status:          "success",
-				StatusCode:      resp.StatusCode,
-				Message:         "request completed",
-				ResponsePreview: preview,
-				ResponseTimeMS:  durationMS,
+				TaskID:           task.ID,
+				TaskName:         task.Name,
+				Status:           "success",
+				StatusCode:       resp.StatusCode,
+				Message:          "request completed",
+				ResponsePreview:  preview,
+				ResponseTimeMS:   durationMS,
 				RequestStartedAt: requestStartedAt,
-				TriggeredBy:     triggeredBy,
-				CreatedAt:       nowString(),
+				TriggeredBy:      triggeredBy,
+				CreatedAt:        nowString(),
 			}
 			s.finishRun(task.ID, result)
 			return result
@@ -1041,16 +1046,16 @@ func (s *Server) executeTask(task Task, triggeredBy string) HistoryItem {
 	}
 
 	result = HistoryItem{
-		TaskID:          task.ID,
-		TaskName:        task.Name,
-		Status:          "failed",
-		StatusCode:      lastStatusCode,
-		Message:         lastMessage,
-		ResponsePreview: preview,
-		ResponseTimeMS:  durationMS,
+		TaskID:           task.ID,
+		TaskName:         task.Name,
+		Status:           "failed",
+		StatusCode:       lastStatusCode,
+		Message:          lastMessage,
+		ResponsePreview:  preview,
+		ResponseTimeMS:   durationMS,
 		RequestStartedAt: lastRequestStartedAt,
-		TriggeredBy:     triggeredBy,
-		CreatedAt:       nowString(),
+		TriggeredBy:      triggeredBy,
+		CreatedAt:        nowString(),
 	}
 	s.finishRun(task.ID, result)
 	return result
@@ -1070,18 +1075,31 @@ func retryDelay(task Task, attempt int, triggeredBy string) time.Duration {
 	return time.Duration(attempt+1) * time.Second
 }
 
-func shouldTriggerAt(task Task, now time.Time, hour, minute int) bool {
+func shouldTriggerAt(task Task, now time.Time, hour, minute, second int) bool {
 	if now.Hour() != hour || now.Minute() != minute {
 		return false
 	}
 
-	second := time.Duration(now.Second()) * time.Second
+	currentSecond := time.Duration(now.Second()) * time.Second
+	targetSecond := time.Duration(second) * time.Second
 	if task.AggressiveMode {
-		return second >= aggressiveStartDelay &&
-			second < aggressiveStartDelay+scheduleTriggerWindow
+		return currentSecond >= targetSecond &&
+			currentSecond < targetSecond+scheduleTriggerWindow
 	}
 
-	return second < scheduleTriggerWindow
+	return currentSecond >= targetSecond && currentSecond < targetSecond+scheduleTriggerWindow
+}
+
+func scheduledRunKey(taskID int, now time.Time, hour, minute, second int) string {
+	return fmt.Sprintf("%d:%04d-%02d-%02d %02d:%02d:%02d",
+		taskID,
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		hour,
+		minute,
+		second,
+	)
 }
 
 func evaluateResponse(task Task, statusCode int, body string) string {
@@ -1162,19 +1180,18 @@ func (s *Server) runScheduledTasks(now time.Time, triggeredBy string) []HistoryI
 	schedule := s.state.Settings.Schedule
 	s.mu.RUnlock()
 	due := make([]Task, 0)
-	currentKey := now.Format("2006-01-02 15:04")
 	for _, task := range tasks {
 		if !task.Enabled {
 			continue
 		}
-		hour, minute := schedule.Hour, schedule.Minute
+		hour, minute, second := schedule.Hour, schedule.Minute, schedule.Second
 		shouldRun := schedule.Enabled
 		if task.ScheduleEnabled {
-			hour, minute = task.ScheduleHour, task.ScheduleMinute
+			hour, minute, second = task.ScheduleHour, task.ScheduleMinute, task.ScheduleSecond
 			shouldRun = true
 		}
-		if shouldRun && shouldTriggerAt(task, now, hour, minute) {
-			runKey := fmt.Sprintf("%d:%s", task.ID, currentKey)
+		if shouldRun && shouldTriggerAt(task, now, hour, minute, second) {
+			runKey := scheduledRunKey(task.ID, now, hour, minute, second)
 			s.scheduleMu.Lock()
 			if _, ok := s.scheduleRan[runKey]; !ok {
 				s.scheduleRan[runKey] = struct{}{}

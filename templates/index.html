@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }}</title>
-    <link rel="stylesheet" href="/static/app.css?v=20260320">
+    <link rel="stylesheet" href="/static/app.css?v=20260326">
 </head>
 <body>
     <div class="shell">
@@ -185,6 +185,10 @@
                                 <span>&#x5355;&#x4EFB;&#x52A1;&#x5206;&#x949F;</span>
                                 <input id="taskMinute" type="number" min="0" max="59" value="0">
                             </label>
+                            <label class="field">
+                                <span>&#x5355;&#x4EFB;&#x52A1;&#x79D2;</span>
+                                <input id="taskSecond" type="number" min="0" max="59" value="0">
+                            </label>
                         </div>
 
                         <div class="toggle-row">
@@ -228,6 +232,10 @@
                         <label class="field">
                             <span>&#x5206;&#x949F;</span>
                             <input id="scheduleMinute" type="number" min="0" max="59">
+                        </label>
+                        <label class="field">
+                            <span>&#x79D2;</span>
+                            <input id="scheduleSecond" type="number" min="0" max="59">
                         </label>
                         <label class="field span-2">
                             <span>&#x5E76;&#x53D1;&#x6267;&#x884C;&#x6570;</span>
@@ -297,6 +305,6 @@
         </section>
     </div>
 
-    <script src="/static/app.js?v=20260320"></script>
+    <script src="/static/app.js?v=20260326b"></script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 let state = {
     tasks: [],
     history: [],
+    scheduleConfig: { enabled: false, hour: 8, minute: 0, second: 0, max_workers: 4 },
     editingId: null,
     taskFilter: "all",
     taskSearch: "",
@@ -26,7 +27,9 @@ const TEXT = {
     timeout: "\u8d85\u65f6",
     retry: "\u91cd\u8bd5",
     lastRun: "\u6700\u8fd1\u8fd0\u884c",
+    nextRun: "\u4e0b\u6b21\u6267\u884c",
     neverRun: "\u4ece\u672a\u6267\u884c",
+    noSchedule: "\u672a\u542f\u7528\u5b9a\u65f6",
     lastDuration: "\u6700\u8fd1\u8017\u65f6",
     run: "\u8fd0\u884c",
     edit: "\u7f16\u8f91",
@@ -139,6 +142,55 @@ function statusLabel(status) {
     return TEXT.statusIdle;
 }
 
+function formatDateTime(value) {
+    return [
+        value.getFullYear(),
+        pad(value.getMonth() + 1),
+        pad(value.getDate()),
+    ].join("-") + " " + [
+        pad(value.getHours()),
+        pad(value.getMinutes()),
+        pad(value.getSeconds()),
+    ].join(":");
+}
+
+function getTaskSchedule(task) {
+    if (task.schedule_enabled) {
+        return {
+            enabled: true,
+            hour: Number(task.schedule_hour || 0),
+            minute: Number(task.schedule_minute || 0),
+            second: Number(task.schedule_second || 0),
+        };
+    }
+
+    if (state.scheduleConfig.enabled) {
+        return {
+            enabled: true,
+            hour: Number(state.scheduleConfig.hour || 0),
+            minute: Number(state.scheduleConfig.minute || 0),
+            second: Number(state.scheduleConfig.second || 0),
+        };
+    }
+
+    return { enabled: false, hour: 0, minute: 0, second: 0 };
+}
+
+function getNextRunLabel(task) {
+    if (!task.enabled) return TEXT.disabled;
+
+    const schedule = getTaskSchedule(task);
+    if (!schedule.enabled) return TEXT.noSchedule;
+
+    const now = new Date();
+    const nextRun = new Date(now);
+    nextRun.setHours(schedule.hour, schedule.minute, schedule.second, 0);
+    if (nextRun <= now) {
+        nextRun.setDate(nextRun.getDate() + 1);
+    }
+    return formatDateTime(nextRun);
+}
+
 function renderSummary(stats) {
     const cards = [
         [TEXT.totalTasks, stats.total_tasks, TEXT.totalTasksNote],
@@ -188,7 +240,7 @@ function renderTasks(tasks) {
 
             <div class="pill-row">
                 <span class="pill">${task.enabled ? TEXT.enabled : TEXT.disabled}</span>
-                <span class="pill">${task.schedule_enabled ? `${TEXT.taskSchedulePrefix}${pad(task.schedule_hour)}:${pad(task.schedule_minute)}` : TEXT.globalSchedule}</span>
+                <span class="pill">${task.schedule_enabled ? `${TEXT.taskSchedulePrefix}${pad(task.schedule_hour)}:${pad(task.schedule_minute)}:${pad(task.schedule_second)}` : TEXT.globalSchedule}</span>
                 <span class="pill">${TEXT.timeout} ${task.timeout_seconds}s</span>
                 <span class="pill">${TEXT.retry} ${task.retry_count}</span>
                 ${task.aggressive_mode ? `<span class="pill">${TEXT.aggressiveMode}</span>` : ""}
@@ -196,6 +248,7 @@ function renderTasks(tasks) {
 
             <div class="meta">
                 ${TEXT.lastRun}\uFF1A${task.last_run_at || TEXT.neverRun}<br>
+                ${TEXT.nextRun}\uFF1A${getNextRunLabel(task)}<br>
                 ${TEXT.lastDuration}\uFF1A${task.last_duration_ms || 0} ms
             </div>
 
@@ -285,9 +338,11 @@ function renderActivityFeed(history) {
 }
 
 function fillSettings(data) {
+    state.scheduleConfig = data.schedule_config || state.scheduleConfig;
     $("scheduleEnabled").checked = !!data.schedule_config.enabled;
     $("scheduleHour").value = data.schedule_config.hour;
     $("scheduleMinute").value = data.schedule_config.minute;
+    $("scheduleSecond").value = data.schedule_config.second;
     $("scheduleWorkers").value = data.schedule_config.max_workers;
 
     $("telegramEnabled").checked = !!data.notify_config.telegram_enabled;
@@ -305,6 +360,7 @@ async function loadBootstrap() {
     const { data } = await api("/api/bootstrap");
     state.tasks = data.tasks;
     state.history = data.history;
+    state.scheduleConfig = data.schedule_config || state.scheduleConfig;
     renderSummary(data.stats);
     renderTasks(data.tasks);
     renderHistory(data.history);
@@ -330,6 +386,7 @@ function getTaskPayload() {
         aggressive_mode: $("taskAggressiveMode").checked,
         schedule_hour: Number($("taskHour").value),
         schedule_minute: Number($("taskMinute").value),
+        schedule_second: Number($("taskSecond").value),
         timeout_seconds: Number($("taskTimeout").value),
         retry_count: Number($("taskRetry").value),
         success_keywords: $("taskSuccessKeywords").value.trim(),
@@ -380,6 +437,7 @@ function editTask(id) {
     $("taskAggressiveMode").checked = !!task.aggressive_mode;
     $("taskHour").value = task.schedule_hour;
     $("taskMinute").value = task.schedule_minute;
+    $("taskSecond").value = task.schedule_second ?? 0;
     $("taskTimeout").value = task.timeout_seconds;
     $("taskRetry").value = task.retry_count;
     $("taskSuccessKeywords").value = task.success_keywords || "";
@@ -402,6 +460,7 @@ function resetTask(showToast = true) {
     $("taskAggressiveMode").checked = false;
     $("taskHour").value = 8;
     $("taskMinute").value = 0;
+    $("taskSecond").value = 0;
     $("taskTimeout").value = 30;
     $("taskRetry").value = 0;
     $("taskSuccessKeywords").value = "";
@@ -444,6 +503,7 @@ async function saveSchedule() {
             enabled: $("scheduleEnabled").checked,
             hour: Number($("scheduleHour").value),
             minute: Number($("scheduleMinute").value),
+            second: Number($("scheduleSecond").value),
             max_workers: Number($("scheduleWorkers").value),
         }),
     });
