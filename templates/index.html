@@ -4,86 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }}</title>
-    <link rel="stylesheet" href="/static/app.css?v=20260326">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/app.css?v=20260326c">
 </head>
 <body>
+    <div class="page-orb page-orb-a"></div>
+    <div class="page-orb page-orb-b"></div>
+
     <div class="shell">
         <header class="topbar">
             <div class="topbar-left">
-                <div class="brand">
+                <div class="brand brand-panel">
                     <div class="brand-mark">Q</div>
                     <div>
                         <strong>QianDao V2</strong>
-                        <span>&#x7B7E;&#x5230;&#x81EA;&#x52A8;&#x5316;&#x63A7;&#x5236;&#x53F0;</span>
+                        <span>自动签到任务控制台</span>
                     </div>
                 </div>
-                <nav class="view-nav">
-                    <button class="nav-button nav-button-active" type="button" id="navOverviewBtn">&#x603B;&#x89C8;</button>
-                    <button class="nav-button" type="button" id="navTasksBtn">&#x4EFB;&#x52A1;</button>
-                    <button class="nav-button" type="button" id="navSettingsBtn">&#x8BBE;&#x7F6E;</button>
+                <nav class="view-nav brand-panel" aria-label="主导航">
+                    <button class="nav-button nav-button-active" type="button" id="navOverviewBtn">总览</button>
+                    <button class="nav-button" type="button" id="navTasksBtn">任务</button>
+                    <button class="nav-button" type="button" id="navSettingsBtn">设置</button>
                 </nav>
             </div>
-            <div class="topbar-right">
-                <button class="nav-button" type="button" id="newTaskBtn">&#x65B0;&#x5EFA;&#x4EFB;&#x52A1;</button>
-                <button class="nav-button" type="button" id="runAllBtn">&#x8FD0;&#x884C;&#x5168;&#x90E8;</button>
-                <button class="nav-button" type="button" id="refreshBtn">&#x5237;&#x65B0;&#x6570;&#x636E;</button>
-                <a class="nav-link" href="/logout">&#x9000;&#x51FA;&#x767B;&#x5F55;</a>
+            <div class="topbar-right quick-actions">
+                <button class="nav-button action-primary" type="button" id="newTaskBtn">新建任务</button>
+                <button class="nav-button" type="button" id="runAllBtn">运行全部</button>
+                <button class="nav-button" type="button" id="refreshBtn">刷新数据</button>
+                <a class="nav-link" href="/logout">退出登录</a>
             </div>
         </header>
 
         <section id="message" class="message hidden"></section>
 
         <section id="overviewView" class="app-view">
-            <section class="hero hero-compact">
+            <section class="hero hero-console">
                 <div class="hero-main">
-                    <span class="eyebrow">Overview</span>
-                    <h1>&#x9996;&#x9875;&#x53EA;&#x770B;&#x8FD0;&#x884C;&#x6570;&#x636E;&#x548C;&#x7CFB;&#x7EDF;&#x72B6;&#x6001;</h1>
-                    <p>&#x8FD9;&#x91CC;&#x53EA;&#x627F;&#x62C5;&#x201C;&#x770B;&#x677F;&#x201D;&#x89D2;&#x8272;&#xFF0C;&#x7528;&#x4E8E;&#x5FEB;&#x901F;&#x5224;&#x65AD;&#x7B7E;&#x5230;&#x4EFB;&#x52A1;&#x662F;&#x5426;&#x6B63;&#x5E38;&#x3001;&#x54EA;&#x4E9B;&#x5730;&#x65B9;&#x9700;&#x8981;&#x5904;&#x7406;&#x3002;</p>
+                    <span class="eyebrow">Automation Console</span>
+                    <h1>把签到任务、调度策略和异常反馈集中到同一个操作视图。</h1>
+                    <p>面向 Docker 部署的自动化控制台，支持任务管理、秒级调度、抢零点优化、通知推送与登录保护，适合长期托管和日常巡检。</p>
+
+                    <div class="hero-metrics">
+                        <div class="hero-metric-card">
+                            <span>部署方式</span>
+                            <strong>Docker / Compose</strong>
+                        </div>
+                        <div class="hero-metric-card">
+                            <span>默认时区</span>
+                            <strong>Asia/Shanghai</strong>
+                        </div>
+                        <div class="hero-metric-card">
+                            <span>通知通道</span>
+                            <strong>Telegram / Webhook</strong>
+                        </div>
+                    </div>
                 </div>
-                <div class="hero-side">
-                    <div class="hero-chip">
-                        <span>&#x9ED8;&#x8BA4;&#x90E8;&#x7F72;</span>
-                        <strong>Docker / Compose</strong>
+
+                <div class="hero-side status-stack">
+                    <div class="status-card accent-blue">
+                        <span class="status-kicker">调度能力</span>
+                        <strong>支持时 / 分 / 秒</strong>
+                        <p>全局与单任务都能精确控制执行时间。</p>
                     </div>
-                    <div class="hero-chip">
-                        <span>&#x8BBF;&#x95EE;&#x7B56;&#x7565;</span>
-                        <strong>&#x9ED8;&#x8BA4;&#x767B;&#x5F55;&#x4FDD;&#x62A4;</strong>
+                    <div class="status-card accent-green">
+                        <span class="status-kicker">抢零点模式</span>
+                        <strong>更快触发与补发</strong>
+                        <p>适合 00:00 首签类任务，减少轮询带来的时间损耗。</p>
                     </div>
+                    <div class="status-card accent-amber">
+                        <span class="status-kicker">访问保护</span>
+                        <strong>默认启用登录密码</strong>
+                        <p>避免裸露控制面板，兼顾远程部署场景。</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="overview-strip">
+                <div class="strip-card">
+                    <span>控制台视图</span>
+                    <strong>总览看健康，任务做编辑，设置管策略</strong>
+                </div>
+                <div class="strip-card">
+                    <span>数据落盘</span>
+                    <strong><code>data/state.json</code> 保存配置与历史</strong>
+                </div>
+                <div class="strip-card">
+                    <span>适用场景</span>
+                    <strong>社区签到、接口打卡、零点抢签</strong>
                 </div>
             </section>
 
             <section class="summary-grid" id="summaryGrid"></section>
 
             <section class="dashboard-grid">
-                <section class="panel">
+                <section class="panel feature-panel health-panel">
                     <div class="section-head">
                         <div>
-                            <h2>&#x8FD0;&#x884C;&#x5065;&#x5EB7;</h2>
-                            <p>&#x57FA;&#x4E8E;&#x6700;&#x8FD1;&#x6267;&#x884C;&#x8BB0;&#x5F55;&#x751F;&#x6210;&#x7684;&#x72B6;&#x6001;&#x6982;&#x89C8;&#x3002;</p>
+                            <span class="section-tag">System Health</span>
+                            <h2>运行健康</h2>
+                            <p>根据最近执行结果快速判断成功率、失败比例与耗时表现。</p>
                         </div>
-                        <button class="nav-button" type="button" id="checkScheduleBtn">&#x68C0;&#x67E5;&#x8C03;&#x5EA6;</button>
+                        <button class="nav-button" type="button" id="checkScheduleBtn">检查调度</button>
                     </div>
                     <div id="healthBars" class="health-bars"></div>
                 </section>
 
-                <section class="panel">
+                <section class="panel feature-panel activity-panel">
                     <div class="section-head">
                         <div>
-                            <h2>&#x8FD1;&#x671F;&#x6D3B;&#x52A8;</h2>
-                            <p>&#x6700;&#x8FD1;&#x8FD0;&#x884C;&#x7684;&#x4EFB;&#x52A1;&#x4F1A;&#x51FA;&#x73B0;&#x5728;&#x8FD9;&#x91CC;&#x3002;</p>
+                            <span class="section-tag">Recent Runs</span>
+                            <h2>近期活动</h2>
+                            <p>关注最近触发的任务、执行状态和提示信息。</p>
                         </div>
                     </div>
                     <div id="activityFeed" class="activity-feed"></div>
                 </section>
             </section>
 
-            <section class="panel">
+            <section class="panel history-panel">
                 <div class="section-head">
                     <div>
-                        <h2>&#x6700;&#x8FD1;&#x8BB0;&#x5F55;</h2>
-                        <p>&#x9996;&#x9875;&#x4FDD;&#x7559;&#x65F6;&#x95F4;&#x7EBF;&#xFF0C;&#x4F46;&#x4E0D;&#x627F;&#x8F7D;&#x914D;&#x7F6E;&#x64CD;&#x4F5C;&#x3002;</p>
+                        <span class="section-tag">Timeline</span>
+                        <h2>最近记录</h2>
+                        <p>保留真实请求发起时间、状态码、耗时和响应片段，便于排查调度慢还是站点慢。</p>
                     </div>
-                    <button class="danger" id="clearHistoryBtn">&#x6E05;&#x7A7A;&#x5386;&#x53F2;</button>
+                    <button class="danger" id="clearHistoryBtn">清空历史</button>
                 </div>
                 <div id="historyList" class="history-list"></div>
             </section>
@@ -95,21 +142,22 @@
                     <section class="panel task-list-panel">
                         <div class="section-head">
                             <div>
-                                <h2>&#x4EFB;&#x52A1;&#x5217;&#x8868;</h2>
-                                <p>&#x7B5B;&#x9009;&#x3001;&#x641C;&#x7D22;&#x5E76;&#x5FEB;&#x901F;&#x5904;&#x7406;&#x4EFB;&#x52A1;&#x3002;</p>
+                                <span class="section-tag">Task Center</span>
+                                <h2>任务列表</h2>
+                                <p>筛选任务状态、搜索目标站点，并从列表快速运行、编辑或删除任务。</p>
                             </div>
                         </div>
 
-                        <div class="toolbar">
+                        <div class="toolbar toolbar-panel">
                             <label class="toolbar-field">
-                                <span>&#x641C;&#x7D22;</span>
-                                <input id="taskSearch" placeholder="&#x641C;&#x7D22;&#x4EFB;&#x52A1;&#x540D;&#x79F0;&#x6216; URL">
+                                <span>搜索任务</span>
+                                <input id="taskSearch" placeholder="搜索任务名称或 URL">
                             </label>
                             <div class="filter-group" id="statusFilters">
-                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">&#x5168;&#x90E8;</button>
-                                <button class="filter-chip" data-filter="success" type="button">&#x6210;&#x529F;</button>
-                                <button class="filter-chip" data-filter="failed" type="button">&#x5931;&#x8D25;</button>
-                                <button class="filter-chip" data-filter="idle" type="button">&#x7A7A;&#x95F2;</button>
+                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">全部</button>
+                                <button class="filter-chip" data-filter="success" type="button">成功</button>
+                                <button class="filter-chip" data-filter="failed" type="button">失败</button>
+                                <button class="filter-chip" data-filter="idle" type="button">空闲</button>
                             </div>
                         </div>
 
@@ -121,94 +169,128 @@
                     <section class="panel task-editor-panel">
                         <div class="section-head">
                             <div>
-                                <h2 id="taskFormTitle">&#x521B;&#x5EFA;&#x4EFB;&#x52A1;</h2>
-                                <p>&#x4EFB;&#x52A1;&#x7F16;&#x8F91;&#x3001;Curl &#x89E3;&#x6790;&#x548C;&#x9884;&#x89C8;&#x90FD;&#x96C6;&#x4E2D;&#x5728;&#x8FD9;&#x91CC;&#x3002;</p>
+                                <span class="section-tag">Editor</span>
+                                <h2 id="taskFormTitle">创建任务</h2>
+                                <p>在同一个编辑面板内完成 Curl 解析、请求配置、调度控制和结果预览。</p>
                             </div>
                         </div>
 
-                        <div class="task-editor-body">
-                        <div class="form-grid">
-                            <label class="field">
-                                <span>&#x4EFB;&#x52A1;&#x540D;&#x79F0;</span>
-                                <input id="taskName" placeholder="&#x4F8B;&#x5982;&#xFF1A;&#x793E;&#x533A;&#x6BCF;&#x65E5;&#x7B7E;&#x5230;">
-                            </label>
-                            <label class="field">
-                                <span>&#x8BF7;&#x6C42;&#x65B9;&#x6CD5;</span>
-                                <select id="taskMethod">
-                                    <option>GET</option>
-                                    <option>POST</option>
-                                    <option>PUT</option>
-                                    <option>PATCH</option>
-                                    <option>DELETE</option>
-                                </select>
-                            </label>
-                            <label class="field span-2">
-                                <span class="field-head">
-                                    <span>Curl &#x547D;&#x4EE4;</span>
-                                    <button class="secondary inline-action" type="button" id="parseCurlBtn">&#x89E3;&#x6790; Curl</button>
-                                </span>
-                                <textarea id="taskCurl" placeholder="&#x7C98;&#x8D34;&#x5B8C;&#x6574;&#x7684; curl &#x547D;&#x4EE4;"></textarea>
-                            </label>
-                            <label class="field span-2">
-                                <span>&#x8BF7;&#x6C42;&#x5730;&#x5740;</span>
-                                <input id="taskURL" placeholder="https://example.com/signin">
-                            </label>
-                            <label class="field span-2">
-                                <span>&#x8BF7;&#x6C42;&#x5934;&#xFF08;JSON&#xFF09;</span>
-                                <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
-                            </label>
-                            <label class="field span-2">
-                                <span>&#x8BF7;&#x6C42;&#x4F53;</span>
-                                <textarea id="taskBody" placeholder="&#x53EF;&#x9009;&#x7684;&#x8BF7;&#x6C42;&#x4F53;"></textarea>
-                            </label>
-                            <label class="field">
-                                <span>&#x8D85;&#x65F6;&#x79D2;&#x6570;</span>
-                                <input id="taskTimeout" type="number" min="1" max="120" value="30">
-                            </label>
-                            <label class="field">
-                                <span>&#x91CD;&#x8BD5;&#x6B21;&#x6570;</span>
-                                <input id="taskRetry" type="number" min="0" max="5" value="0">
-                            </label>
-                            <label class="field">
-                                <span>&#x6210;&#x529F;&#x5173;&#x952E;&#x8BCD;</span>
-                                <input id="taskSuccessKeywords" placeholder="success, &#x7B7E;&#x5230;&#x6210;&#x529F;">
-                            </label>
-                            <label class="field">
-                                <span>&#x5931;&#x8D25;&#x5173;&#x952E;&#x8BCD;</span>
-                                <input id="taskFailureKeywords" placeholder="error, &#x5931;&#x8D25;, &#x8FC7;&#x671F;">
-                            </label>
-                            <label class="field">
-                                <span>&#x5355;&#x4EFB;&#x52A1;&#x5C0F;&#x65F6;</span>
-                                <input id="taskHour" type="number" min="0" max="23" value="8">
-                            </label>
-                            <label class="field">
-                                <span>&#x5355;&#x4EFB;&#x52A1;&#x5206;&#x949F;</span>
-                                <input id="taskMinute" type="number" min="0" max="59" value="0">
-                            </label>
-                            <label class="field">
-                                <span>&#x5355;&#x4EFB;&#x52A1;&#x79D2;</span>
-                                <input id="taskSecond" type="number" min="0" max="59" value="0">
-                            </label>
-                        </div>
+                        <div class="task-editor-body task-editor-layout">
+                            <section class="editor-group">
+                                <div class="editor-group-head">
+                                    <h3>基础信息</h3>
+                                    <p>定义任务名称、请求方法和目标地址。</p>
+                                </div>
+                                <div class="form-grid">
+                                    <label class="field">
+                                        <span>任务名称</span>
+                                        <input id="taskName" placeholder="例如：社区每日签到">
+                                    </label>
+                                    <label class="field">
+                                        <span>请求方法</span>
+                                        <select id="taskMethod">
+                                            <option>GET</option>
+                                            <option>POST</option>
+                                            <option>PUT</option>
+                                            <option>PATCH</option>
+                                            <option>DELETE</option>
+                                        </select>
+                                    </label>
+                                    <label class="field span-2">
+                                        <span>请求地址</span>
+                                        <input id="taskURL" placeholder="https://example.com/signin">
+                                    </label>
+                                </div>
+                            </section>
 
-                        <div class="toggle-row">
-                            <label><input id="taskEnabled" type="checkbox" checked> &#x542F;&#x7528;&#x4EFB;&#x52A1;</label>
-                            <label><input id="taskScheduleEnabled" type="checkbox"> &#x4F7F;&#x7528;&#x5355;&#x4EFB;&#x52A1;&#x5B9A;&#x65F6;</label>
-                            <label><input id="taskAggressiveMode" type="checkbox"> &#x62A2;&#x96F6;&#x70B9;&#x6A21;&#x5F0F;</label>
-                        </div>
+                            <section class="editor-group">
+                                <div class="editor-group-head split-head">
+                                    <div>
+                                        <h3>Curl 解析与请求详情</h3>
+                                        <p>可直接粘贴完整 Curl 命令，也可手动调整请求头与请求体。</p>
+                                    </div>
+                                    <button class="secondary inline-action" type="button" id="parseCurlBtn">解析 Curl</button>
+                                </div>
+                                <div class="form-grid">
+                                    <label class="field span-2">
+                                        <span>Curl 命令</span>
+                                        <textarea id="taskCurl" placeholder="粘贴完整的 curl 命令"></textarea>
+                                    </label>
+                                    <label class="field span-2">
+                                        <span>请求头（JSON）</span>
+                                        <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
+                                    </label>
+                                    <label class="field span-2">
+                                        <span>请求体</span>
+                                        <textarea id="taskBody" placeholder="可选的请求体"></textarea>
+                                    </label>
+                                </div>
+                            </section>
 
-                        <div class="button-row">
-                            <button class="primary" id="saveTaskBtn">&#x4FDD;&#x5B58;&#x4EFB;&#x52A1;</button>
-                            <button class="ghost" id="resetTaskBtn">&#x91CD;&#x7F6E;&#x8868;&#x5355;</button>
-                        </div>
+                            <section class="editor-group">
+                                <div class="editor-group-head">
+                                    <h3>执行策略</h3>
+                                    <p>设置超时、重试和成功 / 失败关键词，用于判断结果与容错。</p>
+                                </div>
+                                <div class="form-grid">
+                                    <label class="field">
+                                        <span>超时秒数</span>
+                                        <input id="taskTimeout" type="number" min="1" max="120" value="30">
+                                    </label>
+                                    <label class="field">
+                                        <span>重试次数</span>
+                                        <input id="taskRetry" type="number" min="0" max="5" value="0">
+                                    </label>
+                                    <label class="field">
+                                        <span>成功关键词</span>
+                                        <input id="taskSuccessKeywords" placeholder="success, 签到成功">
+                                    </label>
+                                    <label class="field">
+                                        <span>失败关键词</span>
+                                        <input id="taskFailureKeywords" placeholder="error, 失败, 过期">
+                                    </label>
+                                </div>
+                            </section>
 
-                        <div class="preview-card">
-                            <div class="preview-head">
-                                <strong>&#x9884;&#x89C8;&#x7ED3;&#x679C;</strong>
-                                <span class="meta">&#x89E3;&#x6790;&#x540E;&#x5728;&#x8FD9;&#x91CC;&#x67E5;&#x770B;&#x8BF7;&#x6C42;&#x7ED3;&#x6784;</span>
+                            <section class="editor-group">
+                                <div class="editor-group-head">
+                                    <h3>调度设置</h3>
+                                    <p>支持单任务时分秒调度，也可以启用抢零点模式处理卡点任务。</p>
+                                </div>
+                                <div class="form-grid schedule-grid">
+                                    <label class="field">
+                                        <span>单任务小时</span>
+                                        <input id="taskHour" type="number" min="0" max="23" value="8">
+                                    </label>
+                                    <label class="field">
+                                        <span>单任务分钟</span>
+                                        <input id="taskMinute" type="number" min="0" max="59" value="0">
+                                    </label>
+                                    <label class="field">
+                                        <span>单任务秒</span>
+                                        <input id="taskSecond" type="number" min="0" max="59" value="0">
+                                    </label>
+                                </div>
+
+                                <div class="toggle-row toggle-panel">
+                                    <label><input id="taskEnabled" type="checkbox" checked> 启用任务</label>
+                                    <label><input id="taskScheduleEnabled" type="checkbox"> 使用单任务定时</label>
+                                    <label><input id="taskAggressiveMode" type="checkbox"> 抢零点模式</label>
+                                </div>
+                            </section>
+
+                            <div class="button-row sticky-actions">
+                                <button class="primary" id="saveTaskBtn">保存任务</button>
+                                <button class="ghost" id="resetTaskBtn">重置表单</button>
                             </div>
-                            <pre id="taskPreview" class="preview">&#x8FD9;&#x91CC;&#x4F1A;&#x663E;&#x793A;&#x89E3;&#x6790;&#x7ED3;&#x679C;&#x6216;&#x5F53;&#x524D;&#x4EFB;&#x52A1;&#x7684;&#x8BE6;&#x7EC6;&#x4FE1;&#x606F;&#x3002;</pre>
-                        </div>
+
+                            <div class="preview-card">
+                                <div class="preview-head">
+                                    <strong>预览结果</strong>
+                                    <span class="meta">解析后在这里查看请求结构与当前任务详情。</span>
+                                </div>
+                                <pre id="taskPreview" class="preview">这里会显示解析结果或当前任务的详细信息。</pre>
+                            </div>
                         </div>
                     </section>
                 </aside>
@@ -216,45 +298,55 @@
         </section>
 
         <section id="settingsView" class="app-view hidden">
+            <section class="settings-hero panel">
+                <div>
+                    <span class="section-tag">Policy Center</span>
+                    <h2>全局策略与访问安全</h2>
+                    <p>统一管理默认调度时间、通知推送方式与控制台登录保护，适合长期部署后的维护场景。</p>
+                </div>
+            </section>
+
             <section class="settings-grid">
-                <section class="panel">
+                <section class="panel settings-panel">
                     <div class="section-head">
                         <div>
-                            <h2>&#x5168;&#x5C40;&#x5B9A;&#x65F6;</h2>
-                            <p>&#x8BBE;&#x7F6E;&#x9ED8;&#x8BA4;&#x7684;&#x6267;&#x884C;&#x65F6;&#x95F4;&#x548C;&#x5E76;&#x53D1;&#x6570;&#x3002;</p>
+                            <span class="section-tag">Schedule</span>
+                            <h2>全局定时</h2>
+                            <p>为未启用单任务定时的任务提供默认执行时间与并发数量。</p>
                         </div>
                     </div>
-                    <div class="form-grid compact-grid">
+                    <div class="form-grid compact-grid schedule-grid">
                         <label class="field">
-                            <span>&#x5C0F;&#x65F6;</span>
+                            <span>小时</span>
                             <input id="scheduleHour" type="number" min="0" max="23">
                         </label>
                         <label class="field">
-                            <span>&#x5206;&#x949F;</span>
+                            <span>分钟</span>
                             <input id="scheduleMinute" type="number" min="0" max="59">
                         </label>
                         <label class="field">
-                            <span>&#x79D2;</span>
+                            <span>秒</span>
                             <input id="scheduleSecond" type="number" min="0" max="59">
                         </label>
                         <label class="field span-2">
-                            <span>&#x5E76;&#x53D1;&#x6267;&#x884C;&#x6570;</span>
+                            <span>并发执行数</span>
                             <input id="scheduleWorkers" type="number" min="1" max="8">
                         </label>
                     </div>
-                    <div class="toggle-row">
-                        <label><input id="scheduleEnabled" type="checkbox"> &#x542F;&#x7528;&#x5168;&#x5C40;&#x5B9A;&#x65F6;</label>
+                    <div class="toggle-row toggle-panel">
+                        <label><input id="scheduleEnabled" type="checkbox"> 启用全局定时</label>
                     </div>
                     <div class="button-row">
-                        <button class="primary" id="saveScheduleBtn">&#x4FDD;&#x5B58;&#x5B9A;&#x65F6;&#x8BBE;&#x7F6E;</button>
+                        <button class="primary" id="saveScheduleBtn">保存定时设置</button>
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="panel settings-panel">
                     <div class="section-head">
                         <div>
-                            <h2>&#x901A;&#x77E5;&#x8BBE;&#x7F6E;</h2>
-                            <p>&#x7BA1;&#x7406; Telegram &#x548C; Webhook &#x901A;&#x77E5;&#x89C4;&#x5219;&#x3002;</p>
+                            <span class="section-tag">Notifications</span>
+                            <h2>通知设置</h2>
+                            <p>管理 Telegram 与 Webhook 推送策略，控制成功或失败时的告警行为。</p>
                         </div>
                     </div>
                     <div class="form-grid compact-grid">
@@ -267,44 +359,45 @@
                             <input id="telegramChatID">
                         </label>
                         <label class="field span-2">
-                            <span>Webhook &#x5730;&#x5740;</span>
+                            <span>Webhook 地址</span>
                             <input id="webhookURL" placeholder="https://example.com/webhook">
                         </label>
                     </div>
-                    <div class="toggle-grid">
-                        <label><input id="telegramEnabled" type="checkbox"> &#x542F;&#x7528; Telegram</label>
-                        <label><input id="webhookEnabled" type="checkbox"> &#x542F;&#x7528; Webhook</label>
-                        <label><input id="notifyOnSuccess" type="checkbox"> &#x6210;&#x529F;&#x65F6;&#x901A;&#x77E5;</label>
-                        <label><input id="notifyOnFailure" type="checkbox"> &#x5931;&#x8D25;&#x65F6;&#x901A;&#x77E5;</label>
+                    <div class="toggle-grid toggle-panel">
+                        <label><input id="telegramEnabled" type="checkbox"> 启用 Telegram</label>
+                        <label><input id="webhookEnabled" type="checkbox"> 启用 Webhook</label>
+                        <label><input id="notifyOnSuccess" type="checkbox"> 成功时通知</label>
+                        <label><input id="notifyOnFailure" type="checkbox"> 失败时通知</label>
                     </div>
                     <div class="button-row">
-                        <button class="secondary" id="saveNotifyBtn">&#x4FDD;&#x5B58;&#x901A;&#x77E5;</button>
-                        <button class="ghost" id="testNotifyBtn">&#x53D1;&#x9001;&#x6D4B;&#x8BD5;&#x901A;&#x77E5;</button>
+                        <button class="secondary" id="saveNotifyBtn">保存通知</button>
+                        <button class="ghost" id="testNotifyBtn">发送测试通知</button>
                     </div>
                 </section>
 
-                <section class="panel">
+                <section class="panel settings-panel security-panel">
                     <div class="section-head">
                         <div>
-                            <h2>&#x5B89;&#x5168;&#x8BBE;&#x7F6E;</h2>
-                            <p>&#x7BA1;&#x7406;&#x767B;&#x5F55;&#x4FDD;&#x62A4;&#x548C;&#x63A7;&#x5236;&#x53F0;&#x8BBF;&#x95EE;&#x6743;&#x9650;&#x3002;</p>
+                            <span class="section-tag">Security</span>
+                            <h2>安全设置</h2>
+                            <p>建议始终启用登录保护，尤其在公网或家庭宽带场景中部署时。</p>
                         </div>
                     </div>
                     <label class="field">
-                        <span>&#x65B0;&#x5BC6;&#x7801;</span>
-                        <input id="securityPassword" type="password" placeholder="&#x81F3;&#x5C11; 6 &#x4F4D;">
+                        <span>新密码</span>
+                        <input id="securityPassword" type="password" placeholder="至少 6 位">
                     </label>
-                    <div class="toggle-row">
-                        <label><input id="securityEnabled" type="checkbox"> &#x542F;&#x7528;&#x767B;&#x5F55;&#x4FDD;&#x62A4;</label>
+                    <div class="toggle-row toggle-panel">
+                        <label><input id="securityEnabled" type="checkbox"> 启用登录保护</label>
                     </div>
                     <div class="button-row">
-                        <button class="primary" id="saveSecurityBtn">&#x4FDD;&#x5B58;&#x5B89;&#x5168;&#x8BBE;&#x7F6E;</button>
+                        <button class="primary" id="saveSecurityBtn">保存安全设置</button>
                     </div>
                 </section>
             </section>
         </section>
     </div>
 
-    <script src="/static/app.js?v=20260326b"></script>
+    <script src="/static/app.js?v=20260326c"></script>
 </body>
 </html>

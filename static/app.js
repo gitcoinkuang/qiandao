@@ -6,6 +6,10 @@ let state = {
     taskFilter: "all",
     taskSearch: "",
     currentView: "overview",
+    loading: {
+        bootstrap: false,
+    },
+    taskActionKey: "",
 };
 
 const TEXT = {
@@ -62,6 +66,8 @@ const TEXT = {
     healthAvg: "\u5e73\u5747\u8017\u65f6",
     healthNoData: "\u6682\u65e0\u8fd0\u884c\u6570\u636e",
     recentFeedEmpty: "\u6682\u65e0\u8fd1\u671f\u6d3b\u52a8",
+    loadingData: "\u6b63\u5728\u52a0\u8f7d\u6570\u636e",
+    loadingAction: "\u5904\u7406\u4e2d",
     taskSchedulePrefix: "\u5355\u4efb\u52a1 ",
     aggressiveMode: "\u62a2\u96f6\u70b9\u6a21\u5f0f",
     requestStartedAt: "\u53d1\u8d77\u65f6\u95f4",
@@ -140,6 +146,101 @@ function statusLabel(status) {
     if (status === "success") return TEXT.statusSuccess;
     if (status === "failed") return TEXT.statusFailed;
     return TEXT.statusIdle;
+}
+
+function getTaskStatusTone(status) {
+    if (status === "success") return "tone-success";
+    if (status === "failed") return "tone-danger";
+    return "tone-neutral";
+}
+
+function createSkeletonLines(count) {
+    return Array.from({ length: count }, () => '<span class="skeleton-line"></span>').join("");
+}
+
+function renderSkeletonState() {
+    $("summaryGrid").innerHTML = Array.from({ length: 4 }, () => `
+        <div class="summary-card skeleton-card">
+            ${createSkeletonLines(3)}
+        </div>
+    `).join("");
+
+    $("taskList").innerHTML = Array.from({ length: 3 }, () => `
+        <div class="task-card skeleton-card">
+            ${createSkeletonLines(5)}
+        </div>
+    `).join("");
+
+    $("historyList").innerHTML = Array.from({ length: 2 }, () => `
+        <div class="history-card skeleton-card">
+            ${createSkeletonLines(5)}
+        </div>
+    `).join("");
+
+    $("healthBars").innerHTML = `
+        <div class="feed-item skeleton-card">
+            ${createSkeletonLines(4)}
+        </div>
+    `;
+
+    $("activityFeed").innerHTML = Array.from({ length: 3 }, () => `
+        <div class="feed-item skeleton-card">
+            ${createSkeletonLines(3)}
+        </div>
+    `).join("");
+}
+
+function setButtonLoading(button, isLoading, loadingText = TEXT.loadingAction) {
+    if (!button) return;
+    if (isLoading) {
+        if (!button.dataset.originalText) {
+            button.dataset.originalText = button.textContent;
+        }
+        button.disabled = true;
+        button.classList.add("is-loading");
+        button.textContent = loadingText;
+        return;
+    }
+
+    button.disabled = false;
+    button.classList.remove("is-loading");
+    if (button.dataset.originalText) {
+        button.textContent = button.dataset.originalText;
+        delete button.dataset.originalText;
+    }
+}
+
+async function withButtonLoading(button, action, loadingText) {
+    setButtonLoading(button, true, loadingText);
+    try {
+        return await action();
+    } finally {
+        setButtonLoading(button, false, loadingText);
+    }
+}
+
+function formatMethod(method) {
+    return `<span class="method-badge">${escapeHTML(method || "GET")}</span>`;
+}
+
+function renderMetaList(items) {
+    return items.map(([label, value]) => `
+        <div class="meta-item">
+            <span>${label}</span>
+            <strong>${escapeHTML(value)}</strong>
+        </div>
+    `).join("");
+}
+
+function getTaskActionMarkup(task) {
+    const runBusy = state.taskActionKey === `run:${task.id}`;
+    const deleteBusy = state.taskActionKey === `delete:${task.id}`;
+
+    return `
+        <button class="primary ${runBusy ? "is-loading" : ""}" data-task-action="run" data-task-id="${task.id}" ${runBusy ? "disabled" : ""}>${runBusy ? TEXT.loadingAction : TEXT.run}</button>
+        <button class="secondary" data-task-action="edit" data-task-id="${task.id}">${TEXT.edit}</button>
+        <button class="danger ${deleteBusy ? "is-loading" : ""}" data-task-action="delete" data-task-id="${task.id}" ${deleteBusy ? "disabled" : ""}>${deleteBusy ? TEXT.loadingAction : TEXT.del}</button>
+    `;
 }
 
 function formatDateTime(value) {
@@ -224,16 +325,19 @@ function renderTasks(tasks) {
     const target = $("taskList");
 
     if (!filtered.length) {
-        target.innerHTML = `<div class="task-card"><div class="meta">${TEXT.noTasks}</div></div>`;
+        target.innerHTML = `<div class="task-card empty-card"><div class="empty-title">暂无匹配任务</div><div class="meta">${TEXT.noTasks}</div></div>`;
         return;
     }
 
     target.innerHTML = filtered.map((task) => `
-        <div class="task-card">
+        <div class="task-card task-card-enhanced ${getTaskStatusTone(task.last_status)}">
             <div class="task-top">
-                <div>
-                    <div class="task-title">${escapeHTML(task.name)}</div>
-                    <div class="meta">${escapeHTML(task.method)} / ${escapeHTML(task.url)}</div>
+                <div class="task-heading">
+                    <div class="task-title-row">
+                        <div class="task-title">${escapeHTML(task.name)}</div>
+                        ${formatMethod(task.method)}
+                    </div>
+                    <div class="meta task-url">${escapeHTML(task.url)}</div>
                 </div>
                 <span class="status-badge ${statusClass(task.last_status)}">${statusLabel(task.last_status)}</span>
             </div>
@@ -246,16 +350,16 @@ function renderTasks(tasks) {
                 ${task.aggressive_mode ? `<span class="pill">${TEXT.aggressiveMode}</span>` : ""}
             </div>
 
-            <div class="meta">
-                ${TEXT.lastRun}\uFF1A${task.last_run_at || TEXT.neverRun}<br>
-                ${TEXT.nextRun}\uFF1A${getNextRunLabel(task)}<br>
-                ${TEXT.lastDuration}\uFF1A${task.last_duration_ms || 0} ms
+            <div class="meta-grid">
+                ${renderMetaList([
+                    [TEXT.lastRun, task.last_run_at || TEXT.neverRun],
+                    [TEXT.nextRun, getNextRunLabel(task)],
+                    [TEXT.lastDuration, `${task.last_duration_ms || 0} ms`],
+                ])}
             </div>
 
             <div class="task-actions">
-                <button class="primary" onclick="runTask(${task.id})">${TEXT.run}</button>
-                <button class="secondary" onclick="editTask(${task.id})">${TEXT.edit}</button>
-                <button class="danger" onclick="deleteTask(${task.id})">${TEXT.del}</button>
+                ${getTaskActionMarkup(task)}
             </div>
         </div>
     `).join("");
@@ -265,23 +369,30 @@ function renderHistory(history) {
     const target = $("historyList");
 
     if (!history.length) {
-        target.innerHTML = `<div class="history-card"><div class="meta">${TEXT.noHistory}</div></div>`;
+        target.innerHTML = `<div class="history-card empty-card"><div class="empty-title">暂无执行历史</div><div class="meta">${TEXT.noHistory}</div></div>`;
         return;
     }
 
     target.innerHTML = history.map((item) => `
-        <div class="history-card">
+        <div class="history-card history-card-enhanced ${getTaskStatusTone(item.status)}">
             <div class="task-top">
-                <div>
+                <div class="task-heading">
                     <div class="task-title">${escapeHTML(item.task_name)}</div>
                     <div class="meta">${escapeHTML(item.triggered_by)} / ${escapeHTML(item.created_at)}</div>
                 </div>
                 <span class="status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
             </div>
-            <div class="meta">${TEXT.statusCode}\uFF1A${item.status_code || 0} / ${TEXT.duration}\uFF1A${item.response_time_ms || 0} ms</div>
-            <div class="meta">${TEXT.requestStartedAt}\uFF1A${escapeHTML(item.request_started_at || "-")}</div>
-            <div class="meta">${escapeHTML(item.message || "")}</div>
-            <pre class="history-preview">${escapeHTML(item.response_preview || "")}</pre>
+
+            <div class="meta-grid compact-meta-grid">
+                ${renderMetaList([
+                    [TEXT.statusCode, String(item.status_code || 0)],
+                    [TEXT.duration, `${item.response_time_ms || 0} ms`],
+                    [TEXT.requestStartedAt, item.request_started_at || "-"],
+                ])}
+            </div>
+
+            <div class="history-message ${item.message ? "" : "history-message-muted"}">${escapeHTML(item.message || "暂无额外消息")}</div>
+            <pre class="history-preview">${escapeHTML(item.response_preview || "无响应预览")}</pre>
         </div>
     `).join("");
 }
@@ -324,15 +435,18 @@ function renderHealthBars(history) {
 function renderActivityFeed(history) {
     const target = $("activityFeed");
     if (!history.length) {
-        target.innerHTML = `<div class="feed-item"><div class="meta">${TEXT.recentFeedEmpty}</div></div>`;
+        target.innerHTML = `<div class="feed-item empty-card"><div class="empty-title">暂无近期活动</div><div class="meta">${TEXT.recentFeedEmpty}</div></div>`;
         return;
     }
 
     target.innerHTML = history.slice(0, 4).map((item) => `
-        <div class="feed-item">
-            <strong>${escapeHTML(item.task_name)}</strong>
-            <div class="meta">${statusLabel(item.status)} / ${escapeHTML(item.created_at)}</div>
-            <div class="meta">${escapeHTML(item.message || "")}</div>
+        <div class="feed-item feed-item-enhanced ${getTaskStatusTone(item.status)}">
+            <div class="feed-top">
+                <strong>${escapeHTML(item.task_name)}</strong>
+                <span class="status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
+            </div>
+            <div class="meta">${escapeHTML(item.created_at)}</div>
+            <div class="feed-message">${escapeHTML(item.message || "暂无额外消息")}</div>
         </div>
     `).join("");
 }
@@ -357,6 +471,8 @@ function fillSettings(data) {
 }
 
 async function loadBootstrap() {
+    state.loading.bootstrap = true;
+    renderSkeletonState();
     const { data } = await api("/api/bootstrap");
     state.tasks = data.tasks;
     state.history = data.history;
@@ -367,6 +483,7 @@ async function loadBootstrap() {
     renderHealthBars(data.history);
     renderActivityFeed(data.history);
     fillSettings(data);
+    state.loading.bootstrap = false;
 }
 
 function getTaskPayload() {
@@ -471,16 +588,30 @@ function resetTask(showToast = true) {
 }
 
 async function runTask(id) {
-    await api(`/api/tasks/${id}/run`, { method: "POST" });
-    showMessage(TEXT.taskExecuted);
-    await loadBootstrap();
+    state.taskActionKey = `run:${id}`;
+    renderTasks(state.tasks);
+    try {
+        await api(`/api/tasks/${id}/run`, { method: "POST" });
+        showMessage(TEXT.taskExecuted);
+        await loadBootstrap();
+    } finally {
+        state.taskActionKey = "";
+        renderTasks(state.tasks);
+    }
 }
 
 async function deleteTask(id) {
     if (!window.confirm(TEXT.confirmDelete)) return;
-    await api(`/api/tasks/${id}`, { method: "DELETE" });
-    showMessage(TEXT.taskDeleted);
-    await loadBootstrap();
+    state.taskActionKey = `delete:${id}`;
+    renderTasks(state.tasks);
+    try {
+        await api(`/api/tasks/${id}`, { method: "DELETE" });
+        showMessage(TEXT.taskDeleted);
+        await loadBootstrap();
+    } finally {
+        state.taskActionKey = "";
+        renderTasks(state.tasks);
+    }
 }
 
 async function runAllTasks() {
@@ -564,27 +695,49 @@ function bindTaskSearch() {
             renderTasks(state.tasks);
         });
     });
+
+    $("taskList").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-task-action]");
+        if (!button) return;
+
+        const id = Number(button.dataset.taskId);
+        const action = button.dataset.taskAction;
+
+        if (action === "run") {
+            runTask(id).catch(handleError);
+            return;
+        }
+
+        if (action === "edit") {
+            editTask(id);
+            return;
+        }
+
+        if (action === "delete") {
+            deleteTask(id).catch(handleError);
+        }
+    });
 }
 
 function attachEvents() {
     $("navOverviewBtn").addEventListener("click", () => setView("overview"));
     $("navTasksBtn").addEventListener("click", () => setView("tasks"));
     $("navSettingsBtn").addEventListener("click", () => setView("settings"));
-    $("runAllBtn").addEventListener("click", () => runAllTasks().catch(handleError));
-    $("refreshBtn").addEventListener("click", () => loadBootstrap().catch(handleError));
+    $("runAllBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => runAllTasks().catch(handleError)));
+    $("refreshBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => loadBootstrap().catch(handleError), TEXT.loadingData));
     $("newTaskBtn").addEventListener("click", () => {
         setView("tasks");
         resetTask();
     });
-    $("parseCurlBtn").addEventListener("click", () => parseCurl().catch(handleError));
-    $("saveTaskBtn").addEventListener("click", () => saveTask().catch(handleError));
+    $("parseCurlBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
+    $("saveTaskBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveTask().catch(handleError)));
     $("resetTaskBtn").addEventListener("click", () => resetTask());
-    $("clearHistoryBtn").addEventListener("click", () => clearHistory().catch(handleError));
-    $("saveScheduleBtn").addEventListener("click", () => saveSchedule().catch(handleError));
-    $("checkScheduleBtn").addEventListener("click", () => checkSchedule().catch(handleError));
-    $("saveNotifyBtn").addEventListener("click", () => saveNotify().catch(handleError));
-    $("testNotifyBtn").addEventListener("click", () => testNotify().catch(handleError));
-    $("saveSecurityBtn").addEventListener("click", () => saveSecurity().catch(handleError));
+    $("clearHistoryBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => clearHistory().catch(handleError)));
+    $("saveScheduleBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSchedule().catch(handleError)));
+    $("checkScheduleBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => checkSchedule().catch(handleError)));
+    $("saveNotifyBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveNotify().catch(handleError)));
+    $("testNotifyBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => testNotify().catch(handleError)));
+    $("saveSecurityBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSecurity().catch(handleError)));
     bindTaskSearch();
 }
 
