@@ -544,6 +544,12 @@ p,
     grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
 }
 
+.task-list-layout,
+.task-editor-page-grid {
+    display: grid;
+    gap: 16px;
+}
+
 .workspace-grid {
     grid-template-columns: minmax(0, 1.1fr) minmax(400px, 0.9fr);
     align-items: start;
@@ -599,11 +605,35 @@ p,
     overflow: hidden;
 }
 
+.task-list-panel-full,
+.task-editor-panel-page {
+    max-height: none;
+    overflow: visible;
+}
+
 .task-list-body,
 .task-editor-body {
     overflow: auto;
     max-height: calc(100vh - 250px);
     padding-right: 6px;
+}
+
+.task-list-panel-full .task-list-body,
+.task-editor-panel-page .task-editor-body {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+}
+
+.task-list-hero,
+.editor-intro {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(242, 247, 251, 0.96)),
+        var(--surface);
+}
+
+.compact-actions {
+    justify-content: flex-end;
 }
 
 .task-list-body::-webkit-scrollbar,
@@ -1190,6 +1220,8 @@ button:disabled {
 
     .hero-metrics,
     .overview-strip,
+    .task-list-layout,
+    .task-editor-page-grid,
     .dashboard-grid,
     .workspace-grid,
     .settings-grid,

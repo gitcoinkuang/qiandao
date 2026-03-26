@@ -137,163 +137,172 @@
         </section>
 
         <section id="tasksView" class="app-view hidden">
-            <section class="workspace-grid">
-                <main class="primary-column">
-                    <section class="panel task-list-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">Task Center</span>
-                                <h2>任务列表</h2>
-                                <p>筛选任务状态、搜索目标站点，并从列表快速运行、编辑或删除任务。</p>
+            <section class="task-list-layout">
+                <section class="task-list-hero panel">
+                    <div class="section-head">
+                        <div>
+                            <span class="section-tag">Task Center</span>
+                            <h2>任务列表</h2>
+                            <p>先在这里查看状态、筛选和巡检任务；需要创建或修改时，再进入独立编辑页，避免列表和表单同时拥挤。</p>
+                        </div>
+                        <button class="primary" type="button" id="taskPageNewBtn">创建新任务</button>
+                    </div>
+                </section>
+
+                <section class="panel task-list-panel task-list-panel-full">
+                    <div class="toolbar toolbar-panel">
+                        <label class="toolbar-field">
+                            <span>搜索任务</span>
+                            <input id="taskSearch" placeholder="搜索任务名称或 URL">
+                        </label>
+                        <div class="filter-group" id="statusFilters">
+                            <button class="filter-chip filter-chip-active" data-filter="all" type="button">全部</button>
+                            <button class="filter-chip" data-filter="success" type="button">成功</button>
+                            <button class="filter-chip" data-filter="failed" type="button">失败</button>
+                            <button class="filter-chip" data-filter="idle" type="button">空闲</button>
+                        </div>
+                    </div>
+
+                    <div id="taskList" class="task-list task-list-body"></div>
+                </section>
+            </section>
+        </section>
+
+        <section id="taskEditorView" class="app-view hidden">
+            <section class="task-editor-page-grid">
+                <section class="editor-intro panel">
+                    <div class="section-head">
+                        <div>
+                            <span class="section-tag">Editor</span>
+                            <h2 id="taskFormTitle">创建任务</h2>
+                            <p>把 Curl 解析、请求配置、调度参数和预览结果拆到独立页面，让编辑时能专注在单个任务本身。</p>
+                        </div>
+                        <div class="button-row compact-actions">
+                            <button class="ghost" type="button" id="taskEditorBackBtn">返回任务列表</button>
+                            <button class="primary" type="button" id="taskEditorNewBlankBtn">新建空白任务</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel task-editor-panel task-editor-panel-page">
+                    <div class="task-editor-body task-editor-layout">
+                        <section class="editor-group">
+                            <div class="editor-group-head">
+                                <h3>基础信息</h3>
+                                <p>定义任务名称、请求方法和目标地址。</p>
                             </div>
+                            <div class="form-grid">
+                                <label class="field">
+                                    <span>任务名称</span>
+                                    <input id="taskName" placeholder="例如：社区每日签到">
+                                </label>
+                                <label class="field">
+                                    <span>请求方法</span>
+                                    <select id="taskMethod">
+                                        <option>GET</option>
+                                        <option>POST</option>
+                                        <option>PUT</option>
+                                        <option>PATCH</option>
+                                        <option>DELETE</option>
+                                    </select>
+                                </label>
+                                <label class="field span-2">
+                                    <span>请求地址</span>
+                                    <input id="taskURL" placeholder="https://example.com/signin">
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="editor-group">
+                            <div class="editor-group-head split-head">
+                                <div>
+                                    <h3>Curl 解析与请求详情</h3>
+                                    <p>可直接粘贴完整 Curl 命令，也可手动调整请求头与请求体。</p>
+                                </div>
+                                <button class="secondary inline-action" type="button" id="parseCurlBtn">解析 Curl</button>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field span-2">
+                                    <span>Curl 命令</span>
+                                    <textarea id="taskCurl" placeholder="粘贴完整的 curl 命令"></textarea>
+                                </label>
+                                <label class="field span-2">
+                                    <span>请求头（JSON）</span>
+                                    <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
+                                </label>
+                                <label class="field span-2">
+                                    <span>请求体</span>
+                                    <textarea id="taskBody" placeholder="可选的请求体"></textarea>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="editor-group">
+                            <div class="editor-group-head">
+                                <h3>执行策略</h3>
+                                <p>设置超时、重试和成功 / 失败关键词，用于判断结果与容错。</p>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field">
+                                    <span>超时秒数</span>
+                                    <input id="taskTimeout" type="number" min="1" max="120" value="30">
+                                </label>
+                                <label class="field">
+                                    <span>重试次数</span>
+                                    <input id="taskRetry" type="number" min="0" max="5" value="0">
+                                </label>
+                                <label class="field">
+                                    <span>成功关键词</span>
+                                    <input id="taskSuccessKeywords" placeholder="success, 签到成功">
+                                </label>
+                                <label class="field">
+                                    <span>失败关键词</span>
+                                    <input id="taskFailureKeywords" placeholder="error, 失败, 过期">
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="editor-group">
+                            <div class="editor-group-head">
+                                <h3>调度设置</h3>
+                                <p>支持单任务时分秒调度，也可以启用抢零点模式处理卡点任务。</p>
+                            </div>
+                            <div class="form-grid schedule-grid">
+                                <label class="field">
+                                    <span>单任务小时</span>
+                                    <input id="taskHour" type="number" min="0" max="23" value="8">
+                                </label>
+                                <label class="field">
+                                    <span>单任务分钟</span>
+                                    <input id="taskMinute" type="number" min="0" max="59" value="0">
+                                </label>
+                                <label class="field">
+                                    <span>单任务秒</span>
+                                    <input id="taskSecond" type="number" min="0" max="59" value="0">
+                                </label>
+                            </div>
+
+                            <div class="toggle-row toggle-panel">
+                                <label><input id="taskEnabled" type="checkbox" checked> 启用任务</label>
+                                <label><input id="taskScheduleEnabled" type="checkbox"> 使用单任务定时</label>
+                                <label><input id="taskAggressiveMode" type="checkbox"> 抢零点模式</label>
+                            </div>
+                        </section>
+
+                        <div class="button-row sticky-actions">
+                            <button class="primary" id="saveTaskBtn">保存任务</button>
+                            <button class="ghost" id="resetTaskBtn">重置表单</button>
                         </div>
 
-                        <div class="toolbar toolbar-panel">
-                            <label class="toolbar-field">
-                                <span>搜索任务</span>
-                                <input id="taskSearch" placeholder="搜索任务名称或 URL">
-                            </label>
-                            <div class="filter-group" id="statusFilters">
-                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">全部</button>
-                                <button class="filter-chip" data-filter="success" type="button">成功</button>
-                                <button class="filter-chip" data-filter="failed" type="button">失败</button>
-                                <button class="filter-chip" data-filter="idle" type="button">空闲</button>
+                        <div class="preview-card">
+                            <div class="preview-head">
+                                <strong>预览结果</strong>
+                                <span class="meta">解析后在这里查看请求结构与当前任务详情。</span>
                             </div>
+                            <pre id="taskPreview" class="preview">这里会显示解析结果或当前任务的详细信息。</pre>
                         </div>
-
-                        <div id="taskList" class="task-list task-list-body"></div>
-                    </section>
-                </main>
-
-                <aside class="secondary-column">
-                    <section class="panel task-editor-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">Editor</span>
-                                <h2 id="taskFormTitle">创建任务</h2>
-                                <p>在同一个编辑面板内完成 Curl 解析、请求配置、调度控制和结果预览。</p>
-                            </div>
-                        </div>
-
-                        <div class="task-editor-body task-editor-layout">
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>基础信息</h3>
-                                    <p>定义任务名称、请求方法和目标地址。</p>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field">
-                                        <span>任务名称</span>
-                                        <input id="taskName" placeholder="例如：社区每日签到">
-                                    </label>
-                                    <label class="field">
-                                        <span>请求方法</span>
-                                        <select id="taskMethod">
-                                            <option>GET</option>
-                                            <option>POST</option>
-                                            <option>PUT</option>
-                                            <option>PATCH</option>
-                                            <option>DELETE</option>
-                                        </select>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求地址</span>
-                                        <input id="taskURL" placeholder="https://example.com/signin">
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head split-head">
-                                    <div>
-                                        <h3>Curl 解析与请求详情</h3>
-                                        <p>可直接粘贴完整 Curl 命令，也可手动调整请求头与请求体。</p>
-                                    </div>
-                                    <button class="secondary inline-action" type="button" id="parseCurlBtn">解析 Curl</button>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field span-2">
-                                        <span>Curl 命令</span>
-                                        <textarea id="taskCurl" placeholder="粘贴完整的 curl 命令"></textarea>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求头（JSON）</span>
-                                        <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求体</span>
-                                        <textarea id="taskBody" placeholder="可选的请求体"></textarea>
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>执行策略</h3>
-                                    <p>设置超时、重试和成功 / 失败关键词，用于判断结果与容错。</p>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field">
-                                        <span>超时秒数</span>
-                                        <input id="taskTimeout" type="number" min="1" max="120" value="30">
-                                    </label>
-                                    <label class="field">
-                                        <span>重试次数</span>
-                                        <input id="taskRetry" type="number" min="0" max="5" value="0">
-                                    </label>
-                                    <label class="field">
-                                        <span>成功关键词</span>
-                                        <input id="taskSuccessKeywords" placeholder="success, 签到成功">
-                                    </label>
-                                    <label class="field">
-                                        <span>失败关键词</span>
-                                        <input id="taskFailureKeywords" placeholder="error, 失败, 过期">
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>调度设置</h3>
-                                    <p>支持单任务时分秒调度，也可以启用抢零点模式处理卡点任务。</p>
-                                </div>
-                                <div class="form-grid schedule-grid">
-                                    <label class="field">
-                                        <span>单任务小时</span>
-                                        <input id="taskHour" type="number" min="0" max="23" value="8">
-                                    </label>
-                                    <label class="field">
-                                        <span>单任务分钟</span>
-                                        <input id="taskMinute" type="number" min="0" max="59" value="0">
-                                    </label>
-                                    <label class="field">
-                                        <span>单任务秒</span>
-                                        <input id="taskSecond" type="number" min="0" max="59" value="0">
-                                    </label>
-                                </div>
-
-                                <div class="toggle-row toggle-panel">
-                                    <label><input id="taskEnabled" type="checkbox" checked> 启用任务</label>
-                                    <label><input id="taskScheduleEnabled" type="checkbox"> 使用单任务定时</label>
-                                    <label><input id="taskAggressiveMode" type="checkbox"> 抢零点模式</label>
-                                </div>
-                            </section>
-
-                            <div class="button-row sticky-actions">
-                                <button class="primary" id="saveTaskBtn">保存任务</button>
-                                <button class="ghost" id="resetTaskBtn">重置表单</button>
-                            </div>
-
-                            <div class="preview-card">
-                                <div class="preview-head">
-                                    <strong>预览结果</strong>
-                                    <span class="meta">解析后在这里查看请求结构与当前任务详情。</span>
-                                </div>
-                                <pre id="taskPreview" class="preview">这里会显示解析结果或当前任务的详细信息。</pre>
-                            </div>
-                        </div>
-                    </section>
-                </aside>
+                    </div>
+                </section>
             </section>
         </section>
 

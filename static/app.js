@@ -23,7 +23,7 @@ const TEXT = {
     enabledTasksNote: "\u5f53\u524d\u4f1a\u53c2\u4e0e\u8fd0\u884c",
     recentSuccessNote: "\u6700\u8fd1\u4e00\u6bb5\u65f6\u95f4\u6210\u529f\u6b21\u6570",
     averageDurationNote: "\u8fd1\u671f\u4efb\u52a1\u5e73\u5747\u54cd\u5e94",
-    noTasks: "\u8fd8\u6ca1\u6709\u4efb\u52a1\u3002\u53ef\u4ee5\u5148\u5728\u53f3\u4fa7\u521b\u5efa\u4efb\u52a1\uff0c\u6216\u7c98\u8d34 Curl \u547d\u4ee4\u8fdb\u884c\u89e3\u6790\u3002",
+    noTasks: "\u8fd8\u6ca1\u6709\u4efb\u52a1\u3002\u53ef\u4ee5\u70b9\u51fb\u201c\u65b0\u5efa\u4efb\u52a1\u201d\u8fdb\u5165\u72ec\u7acb\u7f16\u8f91\u9875\uff0c\u6216\u7c98\u8d34 Curl \u547d\u4ee4\u8fdb\u884c\u89e3\u6790\u3002",
     noHistory: "\u8fd8\u6ca1\u6709\u6267\u884c\u5386\u53f2\u3002\u5f53\u4efb\u52a1\u8fd0\u884c\u540e\uff0c\u8fd9\u91cc\u4f1a\u5f62\u6210\u6e05\u6670\u7684\u65f6\u95f4\u7ebf\u3002",
     enabled: "\u5df2\u542f\u7528",
     disabled: "\u5df2\u505c\u7528",
@@ -82,6 +82,7 @@ function setView(view) {
     const views = {
         overview: $("overviewView"),
         tasks: $("tasksView"),
+        taskEditor: $("taskEditorView"),
         settings: $("settingsView"),
     };
 
@@ -95,9 +96,16 @@ function setView(view) {
         element.classList.toggle("hidden", key !== view);
     });
 
+    const navView = view === "taskEditor" ? "tasks" : view;
+
     Object.entries(buttons).forEach(([key, element]) => {
-        element.classList.toggle("nav-button-active", key === view);
+        element.classList.toggle("nav-button-active", key === navView);
     });
+}
+
+function openTaskEditor() {
+    setView("taskEditor");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function api(url, options = {}) {
@@ -534,13 +542,14 @@ async function saveTask() {
     showMessage(state.editingId ? TEXT.taskUpdated : TEXT.taskCreated);
     resetTask(false);
     await loadBootstrap();
+    setView("tasks");
 }
 
 function editTask(id) {
     const task = state.tasks.find((item) => item.id === id);
     if (!task) return;
 
-    setView("tasks");
+    openTaskEditor();
     state.editingId = id;
     $("taskFormTitle").textContent = `${TEXT.editTaskPrefix}${id}`;
     $("taskName").value = task.name;
@@ -560,7 +569,6 @@ function editTask(id) {
     $("taskSuccessKeywords").value = task.success_keywords || "";
     $("taskFailureKeywords").value = task.failure_keywords || "";
     $("taskPreview").textContent = JSON.stringify(task, null, 2);
-    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function resetTask(showToast = true) {
@@ -726,9 +734,15 @@ function attachEvents() {
     $("runAllBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => runAllTasks().catch(handleError)));
     $("refreshBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => loadBootstrap().catch(handleError), TEXT.loadingData));
     $("newTaskBtn").addEventListener("click", () => {
-        setView("tasks");
         resetTask();
+        openTaskEditor();
     });
+    $("taskPageNewBtn").addEventListener("click", () => {
+        resetTask(false);
+        openTaskEditor();
+    });
+    $("taskEditorNewBlankBtn").addEventListener("click", () => resetTask());
+    $("taskEditorBackBtn").addEventListener("click", () => setView("tasks"));
     $("parseCurlBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
     $("saveTaskBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveTask().catch(handleError)));
     $("resetTaskBtn").addEventListener("click", () => resetTask());
