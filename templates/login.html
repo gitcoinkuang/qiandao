@@ -6,18 +6,15 @@
     <title>QianDao V2 登录</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/app.css?v=20260326c">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/app.css?v=20260326d">
 </head>
 <body class="login-body">
-    <div class="page-orb page-orb-a"></div>
-    <div class="page-orb page-orb-b"></div>
-
     <div class="login-shell">
         <section class="login-intro">
-            <span class="eyebrow intro-eyebrow">Secure Access</span>
-            <h1>登录 QianDao V2</h1>
-            <p>进入自动签到控制台，统一查看任务健康、调度策略、推送状态与历史记录。</p>
+            <span class="hero-eyebrow">Secure Access</span>
+            <h1>QianDao V2</h1>
+            <p>自动签到任务控制台 — 任务管理、秒级调度、Telegram 推送，一站式托管。</p>
             <div class="login-points">
                 <div class="login-point">
                     <strong>任务统一管理</strong>
@@ -35,7 +32,7 @@
         </section>
 
         <form class="login-card" method="post" action="/login">
-            <span class="eyebrow login-card-eyebrow">安全登录</span>
+            <span class="hero-eyebrow">安全登录</span>
             <h2>进入控制台</h2>
             <p>当前控制台已启用访问保护，请输入密码后继续。</p>
             {{ if .Error }}
@@ -45,7 +42,7 @@
                 <span>密码</span>
                 <input name="password" type="password" required autofocus>
             </label>
-            <button class="primary full-width" type="submit">进入控制台</button>
+            <button class="btn-primary" type="submit" style="justify-content:center">进入控制台</button>
         </form>
     </div>
 </body>

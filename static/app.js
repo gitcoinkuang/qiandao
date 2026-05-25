@@ -99,8 +99,55 @@ function setView(view) {
     const navView = view === "taskEditor" ? "tasks" : view;
 
     Object.entries(buttons).forEach(([key, element]) => {
-        element.classList.toggle("nav-button-active", key === navView);
+        element.classList.toggle("sidebar-btn-active", key === navView);
     });
+
+    // 更新页面标题和顶栏操作按钮
+    const pageTitles = { overview: "总览", tasks: "任务", taskEditor: "编辑任务", settings: "设置" };
+    const titleEl = $("pageTitle");
+    if (titleEl) titleEl.textContent = pageTitles[view] || "总览";
+
+    renderTopbarActions();
+}
+
+function renderTopbarActions() {
+    const view = state.currentView;
+    const container = $("topbarActions");
+    if (!container) return;
+
+    let html = "";
+    if (view === "overview") {
+        html = `<button class="btn-ghost" id="refreshBtn">刷新数据</button>
+                <button class="btn-ghost" id="newTaskBtn">新建任务</button>
+                <button class="btn-ghost" id="runAllBtn">运行全部</button>`;
+    } else if (view === "tasks") {
+        html = `<button class="btn-primary" id="taskPageNewBtn">创建新任务</button>
+                <button class="btn-ghost" id="runAllBtn">运行全部</button>`;
+    } else if (view === "taskEditor") {
+        html = `<button class="btn-ghost" id="taskEditorBackBtn">返回任务列表</button>`;
+    } else if (view === "settings") {
+        // 设置页面不需要额外操作按钮
+    }
+    container.innerHTML = html;
+    rebindTopbarEvents();
+}
+
+function rebindTopbarEvents() {
+    const refreshBtn = $("refreshBtn");
+    if (refreshBtn) refreshBtn.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => loadBootstrap().catch(handleError), TEXT.loadingData));
+
+    const newTaskBtn = $("newTaskBtn");
+    if (newTaskBtn) newTaskBtn.addEventListener("click", () => { resetTask(); openTaskEditor(); });
+
+    const runAllBtn = $("runAllBtn");
+    if (runAllBtn) runAllBtn.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => runAllTasks().catch(handleError)));
+
+    const taskPageNewBtn = $("taskPageNewBtn");
+    if (taskPageNewBtn) taskPageNewBtn.addEventListener("click", () => { resetTask(false); openTaskEditor(); });
+
+    const taskEditorBackBtn = $("taskEditorBackBtn");
+    if (taskEditorBackBtn) taskEditorBackBtn.addEventListener("click", () => setView("tasks"));
+
 }
 
 function openTaskEditor() {
@@ -124,10 +171,10 @@ async function api(url, options = {}) {
 
 function showMessage(text, type = "success") {
     messageEl.textContent = text;
-    messageEl.className = `message ${type}`;
+    messageEl.className = `toast toast-${type}`;
     window.clearTimeout(showMessage.timer);
     showMessage.timer = window.setTimeout(() => {
-        messageEl.className = "message hidden";
+        messageEl.className = "toast hidden";
     }, 3200);
 }
 
@@ -245,9 +292,9 @@ function getTaskActionMarkup(task) {
     const deleteBusy = state.taskActionKey === `delete:${task.id}`;
 
     return `
-        <button class="primary ${runBusy ? "is-loading" : ""}" data-task-action="run" data-task-id="${task.id}" ${runBusy ? "disabled" : ""}>${runBusy ? TEXT.loadingAction : TEXT.run}</button>
-        <button class="secondary" data-task-action="edit" data-task-id="${task.id}">${TEXT.edit}</button>
-        <button class="danger ${deleteBusy ? "is-loading" : ""}" data-task-action="delete" data-task-id="${task.id}" ${deleteBusy ? "disabled" : ""}>${deleteBusy ? TEXT.loadingAction : TEXT.del}</button>
+        <button class="btn-primary ${runBusy ? "is-loading" : ""}" data-task-action="run" data-task-id="${task.id}" ${runBusy ? "disabled" : ""}>${runBusy ? TEXT.loadingAction : TEXT.run}</button>
+        <button class="btn-secondary" data-task-action="edit" data-task-id="${task.id}">${TEXT.edit}</button>
+        <button class="btn-danger ${deleteBusy ? "is-loading" : ""}" data-task-action="delete" data-task-id="${task.id}" ${deleteBusy ? "disabled" : ""}>${deleteBusy ? TEXT.loadingAction : TEXT.del}</button>
     `;
 }
 
@@ -731,20 +778,9 @@ function attachEvents() {
     $("navOverviewBtn").addEventListener("click", () => setView("overview"));
     $("navTasksBtn").addEventListener("click", () => setView("tasks"));
     $("navSettingsBtn").addEventListener("click", () => setView("settings"));
-    $("runAllBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => runAllTasks().catch(handleError)));
-    $("refreshBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => loadBootstrap().catch(handleError), TEXT.loadingData));
-    $("newTaskBtn").addEventListener("click", () => {
-        resetTask();
-        openTaskEditor();
-    });
-    $("taskPageNewBtn").addEventListener("click", () => {
-        resetTask(false);
-        openTaskEditor();
-    });
-    $("taskEditorNewBlankBtn").addEventListener("click", () => resetTask());
-    $("taskEditorBackBtn").addEventListener("click", () => setView("tasks"));
-    $("parseCurlBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
     $("saveTaskBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveTask().catch(handleError)));
+    $("taskEditorNewBlankBtn").addEventListener("click", () => resetTask());
+    $("parseCurlBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
     $("resetTaskBtn").addEventListener("click", () => resetTask());
     $("clearHistoryBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => clearHistory().catch(handleError)));
     $("saveScheduleBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSchedule().catch(handleError)));
@@ -753,6 +789,18 @@ function attachEvents() {
     $("testNotifyBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => testNotify().catch(handleError)));
     $("saveSecurityBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSecurity().catch(handleError)));
     bindTaskSearch();
+
+    // 移动端侧边栏控制
+    const mobileBtn = $("mobileMenuBtn");
+    const sidebar = $("sidebar");
+    if (mobileBtn && sidebar) {
+        mobileBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+        });
+        document.querySelector(".main-content").addEventListener("click", () => {
+            sidebar.classList.remove("open");
+        });
+    }
 }
 
 function handleError(error) {
@@ -761,4 +809,5 @@ function handleError(error) {
 
 attachEvents();
 setView("overview");
+renderTopbarActions();
 loadBootstrap().catch(handleError);

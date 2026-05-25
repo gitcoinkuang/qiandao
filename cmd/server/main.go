@@ -642,19 +642,36 @@ func (s *Server) handleNotifyTest(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusMethodNotAllowed, APIResponse{Success: false, Error: "method not allowed"})
 		return
 	}
-	result := HistoryItem{
-		TaskName:         "Notification test",
-		Status:           "success",
-		StatusCode:       200,
-		Message:          "This is a test notification from QianDao V2.",
-		ResponsePreview:  "Notification pipeline is working.",
-		ResponseTimeMS:   42,
-		RequestStartedAt: nowString(),
-		TriggeredBy:      "manual",
-		CreatedAt:        nowString(),
+	s.mu.RLock()
+	notify := s.state.Settings.Notify
+	s.mu.RUnlock()
+
+	message := "This is a test notification from QianDao V2."
+	if notify.TelegramEnabled && notify.TelegramBotToken != "" && notify.TelegramChatID != "" {
+		form := url.Values{}
+		form.Set("chat_id", notify.TelegramChatID)
+		form.Set("text", message)
+		req, err := http.NewRequest(http.MethodPost, "https://api.telegram.org/bot"+notify.TelegramBotToken+"/sendMessage", strings.NewReader(form.Encode()))
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, APIResponse{Success: false, Error: "构造请求失败: " + err.Error()})
+			return
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		resp, err := s.httpClient.Do(req)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, APIResponse{Success: false, Error: "发送请求失败: " + err.Error()})
+			return
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			writeJSON(w, http.StatusOK, APIResponse{Success: false, Error: "Telegram API 返回异常: " + string(body)})
+			return
+		}
+		writeJSON(w, http.StatusOK, APIResponse{Success: true})
+		return
 	}
-	s.sendNotifications(result)
-	writeJSON(w, http.StatusOK, APIResponse{Success: true})
+	writeJSON(w, http.StatusOK, APIResponse{Success: false, Error: "Telegram 未配置或未启用，请先保存通知设置"})
 }
 
 func (s *Server) handleScheduleSettings(w http.ResponseWriter, r *http.Request) {
