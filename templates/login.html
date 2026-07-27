@@ -3,47 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QianDao V2 登录</title>
+    <title>QianDao V2 控制台登录</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/app.css?v=20260326d">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/app.css?v=20260727">
 </head>
 <body class="login-body">
-    <div class="login-shell">
-        <section class="login-intro">
-            <span class="hero-eyebrow">Secure Access</span>
-            <h1>QianDao V2</h1>
-            <p>自动签到任务控制台 — 任务管理、秒级调度、Telegram 推送，一站式托管。</p>
-            <div class="login-points">
-                <div class="login-point">
-                    <strong>任务统一管理</strong>
-                    <span>保存 Curl 配置、定时执行与批量运行。</span>
-                </div>
-                <div class="login-point">
-                    <strong>秒级调度支持</strong>
-                    <span>适合零点签到与需要卡点执行的场景。</span>
-                </div>
-                <div class="login-point">
-                    <strong>默认访问保护</strong>
-                    <span>密码门禁适合公网和长期托管部署。</span>
-                </div>
-            </div>
-        </section>
+    <div class="login-ambient-glow"></div>
 
-        <form class="login-card" method="post" action="/login">
-            <span class="hero-eyebrow">安全登录</span>
-            <h2>进入控制台</h2>
-            <p>当前控制台已启用访问保护，请输入密码后继续。</p>
-            {{ if .Error }}
-            <div class="error-box">{{ .Error }}</div>
-            {{ end }}
+    <div class="login-shell card">
+        <div class="login-header">
+            <div class="login-brand-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <span class="hero-eyebrow">安全访问验证</span>
+            <h1 class="login-title">QianDao 签到控制台</h1>
+            <p class="login-sub">请输入系统访问密码进行身份验证。</p>
+        </div>
+
+        <form class="login-form" method="post" action="/login">
+            {% if Error %}
+            <div class="error-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <span>{{ Error }}</span>
+            </div>
+            {% endif %}
+
             <label class="field">
-                <span>密码</span>
-                <input name="password" type="password" required autofocus>
+                <span>访问密码</span>
+                <input name="password" type="password" required autofocus placeholder="请输入访问密码...">
             </label>
-            <button class="btn-primary" type="submit" style="justify-content:center">进入控制台</button>
+
+            <button class="btn-primary login-btn" type="submit">
+                <span>登录系统</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
         </form>
+
+        <div class="login-footer">
+            <span class="status-dot"></span>
+            <span>会话安全保护开启</span>
+        </div>
     </div>
 </body>
 </html>

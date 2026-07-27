@@ -1,5 +1,9 @@
-.gocache/
-qiandao.exe
-qiandao
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+*.egg-info/
 data/*
 !data/.gitkeep
+.env

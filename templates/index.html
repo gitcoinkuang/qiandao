@@ -3,341 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }}</title>
+    <title>{{ Title }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/app.css?v=20260326d">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/app.css?v=20260727">
 </head>
 <body>
     <div class="shell">
-        <!-- 侧边栏 -->
+        <!-- 侧边栏 Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <div class="brand-mark">Q</div>
                 <div>
-                    <div class="brand-name">QianDao</div>
-                    <div class="brand-sub">自动签到控制台</div>
+                    <div class="brand-name">QianDao 控制台</div>
+                    <div class="brand-sub">v2.0 任务管理系统</div>
                 </div>
             </div>
             <nav class="sidebar-nav">
                 <button class="sidebar-btn sidebar-btn-active" type="button" id="navOverviewBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    <span>总览</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    <span>总览控制台</span>
                 </button>
                 <button class="sidebar-btn" type="button" id="navTasksBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    <span>任务</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    <span>任务中心</span>
                 </button>
                 <button class="sidebar-btn" type="button" id="navSettingsBtn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>设置</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>全局设置</span>
                 </button>
             </nav>
             <div class="sidebar-footer">
-                <span><span class="status-dot"></span>运行中</span>
-                <br>
-                <span class="mono">v2.0</span>
-                <br>
-                <a href="https://github.com/gitcoinkuang/qiandao" target="_blank" rel="noopener" style="color:var(--text-muted);font-size:11px">&copy; gitcoinkuang</a>
+                <div class="status-indicator-wrapper">
+                    <span class="pulse-dot"></span>
+                    <span class="status-text">系统运行中</span>
+                </div>
+                <div class="mono version-badge">引擎版本 v2.0</div>
+                <a href="https://github.com/gitcoinkuang/qiandao" target="_blank" rel="noopener" class="footer-link">&copy; gitcoinkuang</a>
             </div>
         </aside>
 
-        <!-- 主内容 -->
+        <!-- 主内容 Workspace -->
         <main class="main-content">
-            <!-- 顶栏 -->
+            <!-- 顶栏 Console Header -->
             <header class="topbar">
                 <div class="topbar-left">
                     <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                     </button>
-                    <span class="topbar-title" id="pageTitle">总览</span>
+                    <div class="breadcrumb-container">
+                        <span class="breadcrumb-root">控制台</span>
+                        <span class="breadcrumb-separator">/</span>
+                        <span class="topbar-title" id="pageTitle">总览控制台</span>
+                    </div>
                 </div>
-                <div class="topbar-actions" id="topbarActions">
-                    <button class="btn-ghost" id="refreshBtn">刷新数据</button>
+                <div class="topbar-right">
+                    <div class="system-status-pill">
+                        <span class="pulse-dot"></span>
+                        <span>引擎就绪</span>
+                    </div>
+                    <div class="topbar-actions" id="topbarActions"></div>
                 </div>
             </header>
 
-            <!-- 消息提示 -->
+            <!-- 消息提示 Toast -->
             <div id="message" class="toast hidden"></div>
 
-            <!-- 总览视图 -->
+            <!-- 1. 总览视图 Overview View -->
             <section id="overviewView" class="app-view">
-                <section class="hero hero-console">
-                    <div class="hero-main">
-                        <span class="hero-eyebrow">Automation Console</span>
-                        <h1>把签到任务、调度策略和异常反馈集中到同一个操作视图。</h1>
-                        <p>面向 Docker 部署的自动化控制台，支持任务管理、秒级调度、抢零点优化、通知推送与登录保护，适合长期托管和日常巡检。</p>
-
-                        <div class="hero-metrics">
-                            <div class="hero-metric-card">
-                                <span>部署方式</span>
-                                <strong>Docker / Compose</strong>
-                            </div>
-                            <div class="hero-metric-card">
-                                <span>默认时区</span>
-                                <strong>Asia/Shanghai</strong>
-                            </div>
-                            <div class="hero-metric-card">
-                                <span>通知通道</span>
-                                <strong>Telegram / Webhook</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="hero-side">
-                        <div class="status-card tone-success">
-                            <span class="hero-eyebrow">调度能力</span>
-                            <strong>支持时 / 分 / 秒</strong>
-                            <p>全局与单任务都能精确控制执行时间。</p>
-                        </div>
-                        <div class="status-card tone-success">
-                            <span class="hero-eyebrow">抢零点模式</span>
-                            <strong>更快触发与补发</strong>
-                            <p>适合 00:00 首签类任务，减少轮询带来的时间损耗。</p>
-                        </div>
-                        <div class="status-card tone-success">
-                            <span class="hero-eyebrow">访问保护</span>
-                            <strong>默认启用登录密码</strong>
-                            <p>避免裸露控制面板，兼顾远程部署场景。</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="overview-strip">
-                    <div class="strip-card">
-                        <span>控制台视图</span>
-                        <strong>总览看健康，任务做编辑，设置管策略</strong>
-                    </div>
-                    <div class="strip-card">
-                        <span>数据落盘</span>
-                        <strong><code>data/state.json</code> 保存配置与历史</strong>
-                    </div>
-                    <div class="strip-card">
-                        <span>适用场景</span>
-                        <strong>社区签到、接口打卡、零点抢签</strong>
-                    </div>
-                </section>
-
+                <!-- 顶部 KPI 统计 Cards Grid -->
                 <section class="summary-grid" id="summaryGrid"></section>
 
+                <!-- 双栏布局 Dashboard Grid -->
                 <section class="dashboard-grid">
-                    <section class="card feature-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">System Health</span>
-                                <h2>运行健康</h2>
-                                <p>根据最近执行结果快速判断成功率、失败比例与耗时表现。</p>
+                    <!-- 左栏：运行日志流 -->
+                    <div class="dashboard-col-left">
+                        <section class="card feature-panel terminal-panel">
+                            <div class="section-head">
+                                <div>
+                                    <span class="section-tag">运行日志</span>
+                                    <h2>实时日志流</h2>
+                                    <p>实时显示最新的签到请求发起时间、HTTP 状态码及响应耗时。</p>
+                                </div>
+                                <button class="btn-danger" id="clearHistoryBtn" type="button">清空日志</button>
                             </div>
-                            <button class="btn-ghost" type="button" id="checkScheduleBtn">检查调度</button>
-                        </div>
-                        <div id="healthBars" class="health-bars"></div>
-                    </section>
-
-                    <section class="card feature-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">Recent Runs</span>
-                                <h2>近期活动</h2>
-                                <p>关注最近触发的任务、执行状态和提示信息。</p>
-                            </div>
-                        </div>
-                        <div id="activityFeed" class="activity-feed"></div>
-                    </section>
-                </section>
-
-                <section class="card feature-panel">
-                    <div class="section-head">
-                        <div>
-                            <span class="section-tag">Timeline</span>
-                            <h2>最近记录</h2>
-                            <p>保留真实请求发起时间、状态码、耗时和响应片段，便于排查调度慢还是站点慢。</p>
-                        </div>
-                        <button class="btn-danger" id="clearHistoryBtn">清空历史</button>
+                            <div id="historyList" class="history-list"></div>
+                        </section>
                     </div>
-                    <div id="historyList" class="history-list"></div>
+
+                    <!-- 右栏：运行健康度与系统状态 -->
+                    <div class="dashboard-col-right">
+                        <section class="card feature-panel">
+                            <div class="section-head">
+                                <div>
+                                    <span class="section-tag">运行健康度</span>
+                                    <h2>成功率与耗时统计</h2>
+                                    <p>统计近期任务执行结果及平均响应耗时。</p>
+                                </div>
+                                <button class="btn-ghost" type="button" id="checkScheduleBtn">检查定时计划</button>
+                            </div>
+                            <div id="healthBars" class="health-bars"></div>
+                        </section>
+
+                        <section class="card feature-panel">
+                            <div class="section-head">
+                                <div>
+                                    <span class="section-tag">近期活动</span>
+                                    <h2>任务调度记录</h2>
+                                    <p>显示最近签到任务的触发日志。</p>
+                                </div>
+                            </div>
+                            <div id="activityFeed" class="activity-feed"></div>
+                        </section>
+
+                        <section class="card feature-panel policy-widget">
+                            <div class="section-head">
+                                <div>
+                                    <span class="section-tag">系统状态</span>
+                                    <h2>通道与策略</h2>
+                                </div>
+                            </div>
+                            <div id="telemetryWidget" class="telemetry-widget-body">
+                                <div class="telemetry-item">
+                                    <span class="telemetry-label">全局定时调度引擎</span>
+                                    <span class="telemetry-badge badge-active">已启用</span>
+                                </div>
+                                <div class="telemetry-item">
+                                    <span class="telemetry-label">消息推送通道</span>
+                                    <span class="telemetry-badge">Telegram / Webhook</span>
+                                </div>
+                                <div class="telemetry-item">
+                                    <span class="telemetry-label">访问安全防护</span>
+                                    <span class="telemetry-badge badge-secure">密码防护已开启</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
                 </section>
             </section>
 
-            <!-- 任务列表视图 -->
+            <!-- 2. 任务中心视图 Task Center View -->
             <section id="tasksView" class="app-view hidden">
                 <section class="task-list-layout">
-                    <section class="card feature-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">Task Center</span>
-                                <h2>任务列表</h2>
-                                <p>先在这里查看状态、筛选和巡检任务；需要创建或修改时，再进入独立编辑页，避免列表和表单同时拥挤。</p>
+                    <section class="card workbench-toolbar-card">
+                        <div class="workbench-toolbar">
+                            <div class="search-box">
+                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <input id="taskSearch" placeholder="搜索任务名称或 URL 地址... (按 / 聚焦)">
                             </div>
-                            <button class="btn-primary" type="button" id="taskPageNewBtn">创建新任务</button>
+                            <div class="filter-group" id="statusFilters">
+                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">全部</button>
+                                <button class="filter-chip" data-filter="active" type="button">已启用</button>
+                                <button class="filter-chip" data-filter="success" type="button">成功</button>
+                                <button class="filter-chip" data-filter="failed" type="button">失败</button>
+                                <button class="filter-chip" data-filter="idle" type="button">未运行</button>
+                            </div>
                         </div>
                     </section>
 
-                    <section class="card feature-panel">
-                        <div class="toolbar">
-                            <label class="toolbar-field">
-                                <span>搜索任务</span>
-                                <input id="taskSearch" placeholder="搜索任务名称或 URL">
-                            </label>
-                            <div class="filter-group" id="statusFilters">
-                                <button class="filter-chip filter-chip-active" data-filter="all" type="button">全部</button>
-                                <button class="filter-chip" data-filter="success" type="button">成功</button>
-                                <button class="filter-chip" data-filter="failed" type="button">失败</button>
-                                <button class="filter-chip" data-filter="idle" type="button">空闲</button>
-                            </div>
-                        </div>
-
+                    <section class="card task-grid-card">
                         <div id="taskList" class="task-list-body"></div>
                     </section>
                 </section>
             </section>
 
-            <!-- 任务编辑器视图 -->
+            <!-- 3. 任务编辑视图 Task Studio View -->
             <section id="taskEditorView" class="app-view hidden">
-                <section class="task-editor-page-grid">
-                    <section class="card feature-panel">
-                        <div class="section-head">
-                            <div>
-                                <span class="section-tag">Editor</span>
-                                <h2 id="taskFormTitle">创建任务</h2>
-                                <p>把 Curl 解析、请求配置、调度参数和预览结果拆到独立页面，让编辑时能专注在单个任务本身。</p>
-                            </div>
-                            <div class="button-row">
-                                <button class="btn-ghost" type="button" id="taskEditorBackBtn">返回任务列表</button>
-                                <button class="btn-primary" type="button" id="taskEditorNewBlankBtn">新建空白任务</button>
-                            </div>
+                <section class="studio-header-card card">
+                    <div class="section-head">
+                        <div>
+                            <span class="section-tag">任务配置中心</span>
+                            <h2 id="taskFormTitle">新建签到任务</h2>
+                            <p>配置 HTTP 请求参数、定时执行时间以及预览生成的请求载荷。</p>
                         </div>
-                    </section>
-
-                    <section class="card feature-panel">
-                        <div class="task-editor-layout">
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>基础信息</h3>
-                                    <p>定义任务名称、请求方法和目标地址。</p>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field">
-                                        <span>任务名称</span>
-                                        <input id="taskName" placeholder="例如：社区每日签到">
-                                    </label>
-                                    <label class="field">
-                                        <span>请求方法</span>
-                                        <select id="taskMethod">
-                                            <option>GET</option>
-                                            <option>POST</option>
-                                            <option>PUT</option>
-                                            <option>PATCH</option>
-                                            <option>DELETE</option>
-                                        </select>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求地址</span>
-                                        <input id="taskURL" placeholder="https://example.com/signin">
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <div>
-                                        <h3>Curl 解析与请求详情</h3>
-                                        <p>可直接粘贴完整 Curl 命令，也可手动调整请求头与请求体。</p>
-                                    </div>
-                                    <button class="btn-secondary" type="button" id="parseCurlBtn">解析 Curl</button>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field span-2">
-                                        <span>Curl 命令</span>
-                                        <textarea id="taskCurl" placeholder="粘贴完整的 curl 命令"></textarea>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求头（JSON）</span>
-                                        <textarea id="taskHeaders" placeholder='{"User-Agent":"Mozilla/5.0"}'></textarea>
-                                    </label>
-                                    <label class="field span-2">
-                                        <span>请求体</span>
-                                        <textarea id="taskBody" placeholder="可选的请求体"></textarea>
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>执行策略</h3>
-                                    <p>设置超时、重试和成功 / 失败关键词，用于判断结果与容错。</p>
-                                </div>
-                                <div class="form-grid">
-                                    <label class="field">
-                                        <span>超时秒数</span>
-                                        <input id="taskTimeout" type="number" min="1" max="120" value="30">
-                                    </label>
-                                    <label class="field">
-                                        <span>重试次数</span>
-                                        <input id="taskRetry" type="number" min="0" max="5" value="0">
-                                    </label>
-                                    <label class="field">
-                                        <span>成功关键词</span>
-                                        <input id="taskSuccessKeywords" placeholder="success, 签到成功">
-                                    </label>
-                                    <label class="field">
-                                        <span>失败关键词</span>
-                                        <input id="taskFailureKeywords" placeholder="error, 失败, 过期">
-                                    </label>
-                                </div>
-                            </section>
-
-                            <section class="editor-group">
-                                <div class="editor-group-head">
-                                    <h3>调度设置</h3>
-                                    <p>支持单任务时分秒调度，也可以启用抢零点模式处理卡点任务。</p>
-                                </div>
-                                <div class="form-grid schedule-grid">
-                                    <label class="field">
-                                        <span>单任务小时</span>
-                                        <input id="taskHour" type="number" min="0" max="23" value="8">
-                                    </label>
-                                    <label class="field">
-                                        <span>单任务分钟</span>
-                                        <input id="taskMinute" type="number" min="0" max="59" value="0">
-                                    </label>
-                                    <label class="field">
-                                        <span>单任务秒</span>
-                                        <input id="taskSecond" type="number" min="0" max="59" value="0">
-                                    </label>
-                                </div>
-
-                                <div class="toggle-panel">
-                                    <label class="toggle"><input id="taskEnabled" type="checkbox" checked> 启用任务</label>
-                                    <label class="toggle"><input id="taskScheduleEnabled" type="checkbox"> 使用单任务定时</label>
-                                    <label class="toggle"><input id="taskAggressiveMode" type="checkbox"> 抢零点模式</label>
-                                </div>
-                            </section>
-
-                            <div class="button-row sticky-actions">
-                                <button class="btn-primary" id="saveTaskBtn">保存任务</button>
-                                <button class="btn-ghost" id="resetTaskBtn">重置表单</button>
-                            </div>
-
-                            <div class="preview-card">
-                                <div class="preview-head">
-                                    <strong>预览结果</strong>
-                                    <span class="meta">解析后在这里查看请求结构与当前任务详情。</span>
-                                </div>
-                                <pre id="taskPreview" class="preview">这里会显示解析结果或当前任务的详细信息。</pre>
-                            </div>
+                        <div class="button-row">
+                            <button class="btn-ghost" type="button" id="taskEditorBackBtn">&larr; 返回任务列表</button>
+                            <button class="btn-secondary" type="button" id="taskEditorNewBlankBtn">清空表单</button>
                         </div>
-                    </section>
+                    </div>
                 </section>
+
+                <div class="studio-layout">
+                    <!-- 左侧表单区域 -->
+                    <div class="studio-left-pane">
+                        <section class="card editor-group">
+                            <div class="editor-group-head">
+                                <div>
+                                    <h3>基本信息</h3>
+                                    <p>定义任务名称、HTTP 请求方法和目标接口 URL。</p>
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field">
+                                    <span>任务名称</span>
+                                    <input id="taskName" placeholder="例如: B站每日自动签到">
+                                </label>
+                                <label class="field">
+                                    <span>HTTP 方法</span>
+                                    <select id="taskMethod">
+                                        <option>GET</option>
+                                        <option>POST</option>
+                                        <option>PUT</option>
+                                        <option>PATCH</option>
+                                        <option>DELETE</option>
+                                    </select>
+                                </label>
+                                <label class="field span-2">
+                                    <span>请求接口 URL</span>
+                                    <input id="taskURL" placeholder="https://api.example.com/v1/checkin">
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="card editor-group">
+                            <div class="editor-group-head">
+                                <div>
+                                    <h3>超时与重试策略</h3>
+                                    <p>配置请求超时时间、失败重试次数及状态匹配关键字。</p>
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field">
+                                    <span>超时时间 (秒)</span>
+                                    <input id="taskTimeout" type="number" min="1" max="120" value="30">
+                                </label>
+                                <label class="field">
+                                    <span>重试次数</span>
+                                    <input id="taskRetry" type="number" min="0" max="5" value="0">
+                                </label>
+                                <label class="field">
+                                    <span>成功匹配关键字</span>
+                                    <input id="taskSuccessKeywords" placeholder="success, 200, ok">
+                                </label>
+                                <label class="field">
+                                    <span>失败匹配关键字</span>
+                                    <input id="taskFailureKeywords" placeholder="error, expired, unauthorized">
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="card editor-group">
+                            <div class="editor-group-head">
+                                <div>
+                                    <h3>定时调度与抢零点策略</h3>
+                                    <p>设置独立的执行时间（时:分:秒）或开启零点极速抢签模式。</p>
+                                </div>
+                            </div>
+                            <div class="form-grid schedule-grid">
+                                <label class="field">
+                                    <span>时 (0-23)</span>
+                                    <input id="taskHour" type="number" min="0" max="23" value="8">
+                                </label>
+                                <label class="field">
+                                    <span>分 (0-59)</span>
+                                    <input id="taskMinute" type="number" min="0" max="59" value="0">
+                                </label>
+                                <label class="field">
+                                    <span>秒 (0-59)</span>
+                                    <input id="taskSecond" type="number" min="0" max="59" value="0">
+                                </label>
+                            </div>
+
+                            <div class="toggle-panel">
+                                <label class="toggle"><input id="taskEnabled" type="checkbox" checked> <span>启用此任务</span></label>
+                                <label class="toggle"><input id="taskScheduleEnabled" type="checkbox"> <span>使用独立定时时间</span></label>
+                                <label class="toggle"><input id="taskAggressiveMode" type="checkbox"> <span>开启抢零点模式 (00:00 毫秒级极速对齐)</span></label>
+                            </div>
+                        </section>
+
+                        <div class="button-row sticky-actions">
+                            <button class="btn-primary" id="saveTaskBtn">保存任务</button>
+                            <button class="btn-ghost" id="resetTaskBtn">重置表单</button>
+                        </div>
+                    </div>
+
+                    <!-- 右侧 cURL 导入与配置预览 -->
+                    <div class="studio-right-pane">
+                        <section class="card editor-group">
+                            <div class="editor-group-head">
+                                <div>
+                                    <h3>cURL 命令导入解析</h3>
+                                    <p>粘贴从浏览器工具复制的 cURL 命令以自动解析配置。</p>
+                                </div>
+                                <button class="btn-secondary" type="button" id="parseCurlBtn">解析 cURL</button>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field span-2">
+                                    <span>cURL 命令字符串</span>
+                                    <textarea id="taskCurl" placeholder="curl -X POST 'https://api.example.com/checkin' -H 'Authorization: Bearer token'"></textarea>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="card editor-group">
+                            <div class="editor-group-head">
+                                <div>
+                                    <h3>请求头与请求体 Payload</h3>
+                                    <p>设置 JSON 格式 Headers 请求头和 Request Body 数据。</p>
+                                </div>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field span-2">
+                                    <span>Headers 请求头 (JSON 格式)</span>
+                                    <textarea id="taskHeaders" placeholder='{"User-Agent": "Mozilla/5.0", "Content-Type": "application/json"}'></textarea>
+                                </label>
+                                <label class="field span-2">
+                                    <span>请求体 Body</span>
+                                    <textarea id="taskBody" placeholder='{"action": "daily_checkin"}'></textarea>
+                                </label>
+                            </div>
+                        </section>
+
+                        <section class="card preview-card">
+                            <div class="preview-head">
+                                <div>
+                                    <strong>配置实时预览</strong>
+                                    <span class="meta">实时解析校验生成的任务配置</span>
+                                </div>
+                            </div>
+                            <pre id="taskPreview" class="preview">解析或修改后生成的配置预览将在此处显示...</pre>
+                        </section>
+                    </div>
+                </div>
             </section>
 
-            <!-- 设置视图 -->
+            <!-- 4. 策略与设置视图 Settings & Policy View -->
             <section id="settingsView" class="app-view hidden">
-                <section class="card settings-hero">
+                <section class="card feature-panel">
                     <div>
-                        <span class="section-tag">Policy Center</span>
-                        <h2>全局策略与访问安全</h2>
-                        <p>统一管理默认调度时间、通知推送方式与控制台登录保护，适合长期部署后的维护场景。</p>
+                        <span class="section-tag">设置中心</span>
+                        <h2>全局系统策略与访问安全设置</h2>
+                        <p>配置全局定时任务、通知推送通道及系统访问密码。</p>
                     </div>
                 </section>
 
@@ -345,67 +342,67 @@
                     <section class="card settings-panel">
                         <div class="section-head">
                             <div>
-                                <span class="section-tag">Schedule</span>
-                                <h2>全局定时</h2>
-                                <p>为未启用单任务定时的任务提供默认执行时间与并发数量。</p>
+                                <span class="section-tag">定时任务调度器</span>
+                                <h2>全局定时策略</h2>
+                                <p>针对未开启独立定时的任务，配置统一的执行时间与并发数。</p>
                             </div>
                         </div>
                         <div class="form-grid schedule-grid compact-grid">
                             <label class="field">
-                                <span>小时</span>
+                                <span>时 (0-23)</span>
                                 <input id="scheduleHour" type="number" min="0" max="23">
                             </label>
                             <label class="field">
-                                <span>分钟</span>
+                                <span>分 (0-59)</span>
                                 <input id="scheduleMinute" type="number" min="0" max="59">
                             </label>
                             <label class="field">
-                                <span>秒</span>
+                                <span>秒 (0-59)</span>
                                 <input id="scheduleSecond" type="number" min="0" max="59">
                             </label>
                             <label class="field span-2">
-                                <span>并发执行数</span>
+                                <span>最大并发任务数</span>
                                 <input id="scheduleWorkers" type="number" min="1" max="8">
                             </label>
                         </div>
                         <div class="toggle-panel">
-                            <label class="toggle"><input id="scheduleEnabled" type="checkbox"> 启用全局定时</label>
+                            <label class="toggle"><input id="scheduleEnabled" type="checkbox"> <span>开启全局定时任务</span></label>
                         </div>
                         <div class="button-row">
-                            <button class="btn-primary" id="saveScheduleBtn">保存定时设置</button>
+                            <button class="btn-primary" id="saveScheduleBtn">保存定时策略</button>
                         </div>
                     </section>
 
                     <section class="card settings-panel">
                         <div class="section-head">
                             <div>
-                                <span class="section-tag">Notifications</span>
-                                <h2>通知设置</h2>
-                                <p>管理 Telegram 与 Webhook 推送策略，控制成功或失败时的告警行为。</p>
+                                <span class="section-tag">通知与告警</span>
+                                <h2>消息通知通道</h2>
+                                <p>配置 Telegram Bot 机器人通知及自定义 Webhook 推送。</p>
                             </div>
                         </div>
                         <div class="form-grid compact-grid">
-                            <label class="field">
+                            <label class="field span-2">
                                 <span>Telegram Bot Token</span>
-                                <input id="telegramBotToken">
-                            </label>
-                            <label class="field">
-                                <span>Telegram Chat ID</span>
-                                <input id="telegramChatID">
+                                <input id="telegramBotToken" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ">
                             </label>
                             <label class="field span-2">
-                                <span>Webhook 地址</span>
-                                <input id="webhookURL" placeholder="https://example.com/webhook">
+                                <span>Telegram Chat ID</span>
+                                <input id="telegramChatID" placeholder="-100123456789">
+                            </label>
+                            <label class="field span-2">
+                                <span>自定义 Webhook URL</span>
+                                <input id="webhookURL" placeholder="https://hooks.slack.com/services/...">
                             </label>
                         </div>
                         <div class="toggle-panel">
-                            <label class="toggle"><input id="telegramEnabled" type="checkbox"> 启用 Telegram</label>
-                            <label class="toggle"><input id="webhookEnabled" type="checkbox"> 启用 Webhook</label>
-                            <label class="toggle"><input id="notifyOnSuccess" type="checkbox"> 成功时通知</label>
-                            <label class="toggle"><input id="notifyOnFailure" type="checkbox"> 失败时通知</label>
+                            <label class="toggle"><input id="telegramEnabled" type="checkbox"> <span>开启 Telegram 通知</span></label>
+                            <label class="toggle"><input id="webhookEnabled" type="checkbox"> <span>开启 Webhook 通知</span></label>
+                            <label class="toggle"><input id="notifyOnSuccess" type="checkbox"> <span>签到成功时发送通知</span></label>
+                            <label class="toggle"><input id="notifyOnFailure" type="checkbox"> <span>签到失败时发送通知</span></label>
                         </div>
                         <div class="button-row">
-                            <button class="btn-secondary" id="saveNotifyBtn">保存通知</button>
+                            <button class="btn-secondary" id="saveNotifyBtn">保存通知设置</button>
                             <button class="btn-ghost" id="testNotifyBtn">发送测试通知</button>
                         </div>
                     </section>
@@ -413,17 +410,19 @@
                     <section class="card settings-panel">
                         <div class="section-head">
                             <div>
-                                <span class="section-tag">Security</span>
-                                <h2>安全设置</h2>
-                                <p>建议始终启用登录保护，尤其在公网或家庭宽带场景中部署时。</p>
+                                <span class="section-tag">安全与权限</span>
+                                <h2>访问安全保护</h2>
+                                <p>开启密码控制，防止未经授权访问控制台。</p>
                             </div>
                         </div>
-                        <label class="field">
-                            <span>新密码</span>
-                            <input id="securityPassword" type="password" placeholder="至少 6 位">
-                        </label>
+                        <div class="form-grid compact-grid">
+                            <label class="field span-2">
+                                <span>控制台访问密码</span>
+                                <input id="securityPassword" type="password" placeholder="至少 6 个字符">
+                            </label>
+                        </div>
                         <div class="toggle-panel">
-                            <label class="toggle"><input id="securityEnabled" type="checkbox"> 启用登录保护</label>
+                            <label class="toggle"><input id="securityEnabled" type="checkbox"> <span>启用控制台密码验证</span></label>
                         </div>
                         <div class="button-row">
                             <button class="btn-primary" id="saveSecurityBtn">保存安全设置</button>
@@ -434,6 +433,6 @@
         </main>
     </div>
 
-    <script src="/static/app.js?v=20260326d"></script>
+    <script src="/static/app.js?v=20260727"></script>
 </body>
 </html>

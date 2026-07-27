@@ -13,64 +13,64 @@ let state = {
 };
 
 const TEXT = {
-    requestFailed: "\u8bf7\u6c42\u5931\u8d25",
-    unexpectedError: "\u53d1\u751f\u4e86\u672a\u9884\u671f\u7684\u9519\u8bef",
-    totalTasks: "\u4efb\u52a1\u603b\u6570",
-    enabledTasks: "\u542f\u7528\u4efb\u52a1",
-    recentSuccess: "\u6700\u8fd1\u6210\u529f",
-    averageDuration: "\u5e73\u5747\u8017\u65f6",
-    totalTasksNote: "\u6240\u6709\u4efb\u52a1",
-    enabledTasksNote: "\u5f53\u524d\u4f1a\u53c2\u4e0e\u8fd0\u884c",
-    recentSuccessNote: "\u6700\u8fd1\u4e00\u6bb5\u65f6\u95f4\u6210\u529f\u6b21\u6570",
-    averageDurationNote: "\u8fd1\u671f\u4efb\u52a1\u5e73\u5747\u54cd\u5e94",
-    noTasks: "\u8fd8\u6ca1\u6709\u4efb\u52a1\u3002\u53ef\u4ee5\u70b9\u51fb\u201c\u65b0\u5efa\u4efb\u52a1\u201d\u8fdb\u5165\u72ec\u7acb\u7f16\u8f91\u9875\uff0c\u6216\u7c98\u8d34 Curl \u547d\u4ee4\u8fdb\u884c\u89e3\u6790\u3002",
-    noHistory: "\u8fd8\u6ca1\u6709\u6267\u884c\u5386\u53f2\u3002\u5f53\u4efb\u52a1\u8fd0\u884c\u540e\uff0c\u8fd9\u91cc\u4f1a\u5f62\u6210\u6e05\u6670\u7684\u65f6\u95f4\u7ebf\u3002",
-    enabled: "\u5df2\u542f\u7528",
-    disabled: "\u5df2\u505c\u7528",
-    globalSchedule: "\u8ddf\u968f\u5168\u5c40\u8c03\u5ea6",
-    timeout: "\u8d85\u65f6",
-    retry: "\u91cd\u8bd5",
-    lastRun: "\u6700\u8fd1\u8fd0\u884c",
-    nextRun: "\u4e0b\u6b21\u6267\u884c",
-    neverRun: "\u4ece\u672a\u6267\u884c",
-    noSchedule: "\u672a\u542f\u7528\u5b9a\u65f6",
-    lastDuration: "\u6700\u8fd1\u8017\u65f6",
-    run: "\u8fd0\u884c",
-    edit: "\u7f16\u8f91",
-    del: "\u5220\u9664",
-    statusCode: "\u72b6\u6001\u7801",
-    duration: "\u8017\u65f6",
-    parseSuccess: "Curl \u89e3\u6790\u6210\u529f",
-    taskCreated: "\u4efb\u52a1\u5df2\u521b\u5efa",
-    taskUpdated: "\u4efb\u52a1\u5df2\u66f4\u65b0",
-    taskDeleted: "\u4efb\u52a1\u5df2\u5220\u9664",
-    taskExecuted: "\u4efb\u52a1\u5df2\u6267\u884c",
-    allExecuted: "\u5168\u90e8\u542f\u7528\u4efb\u52a1\u5df2\u6267\u884c",
-    historyCleared: "\u5386\u53f2\u8bb0\u5f55\u5df2\u6e05\u7a7a",
-    scheduleSaved: "\u5b9a\u65f6\u8bbe\u7f6e\u5df2\u4fdd\u5b58",
-    scheduleChecked: "\u5b9a\u65f6\u68c0\u67e5\u5df2\u6267\u884c",
-    notifySaved: "\u901a\u77e5\u8bbe\u7f6e\u5df2\u4fdd\u5b58",
-    notifyTestSent: "\u6d4b\u8bd5\u901a\u77e5\u5df2\u53d1\u9001",
-    securitySaved: "\u5b89\u5168\u8bbe\u7f6e\u5df2\u4fdd\u5b58",
-    formReset: "\u8868\u5355\u5df2\u91cd\u7f6e",
-    createTask: "\u521b\u5efa\u4efb\u52a1",
-    editTaskPrefix: "\u7f16\u8f91\u4efb\u52a1 #",
-    taskPreviewHint: "\u8fd9\u91cc\u4f1a\u663e\u793a Curl \u89e3\u6790\u7ed3\u679c\u6216\u5f53\u524d\u4efb\u52a1\u8be6\u60c5\u3002",
-    confirmDelete: "\u786e\u5b9a\u5220\u9664\u8fd9\u4e2a\u4efb\u52a1\u5417\uff1f",
-    confirmClear: "\u786e\u5b9a\u6e05\u7a7a\u6240\u6709\u5386\u53f2\u8bb0\u5f55\u5417\uff1f",
-    statusSuccess: "\u6210\u529f",
-    statusFailed: "\u5931\u8d25",
-    statusIdle: "\u7a7a\u95f2",
-    healthSuccess: "\u6210\u529f\u8fd0\u884c",
-    healthFailed: "\u5931\u8d25\u8fd0\u884c",
-    healthAvg: "\u5e73\u5747\u8017\u65f6",
-    healthNoData: "\u6682\u65e0\u8fd0\u884c\u6570\u636e",
-    recentFeedEmpty: "\u6682\u65e0\u8fd1\u671f\u6d3b\u52a8",
-    loadingData: "\u6b63\u5728\u52a0\u8f7d\u6570\u636e",
-    loadingAction: "\u5904\u7406\u4e2d",
-    taskSchedulePrefix: "\u5355\u4efb\u52a1 ",
-    aggressiveMode: "\u62a2\u96f6\u70b9\u6a21\u5f0f",
-    requestStartedAt: "\u53d1\u8d77\u65f6\u95f4",
+    requestFailed: "请求失败",
+    unexpectedError: "发生了未预期的错误",
+    totalTasks: "任务总数",
+    enabledTasks: "已启用任务",
+    recentSuccess: "成功率",
+    averageDuration: "平均响应耗时",
+    totalTasksNote: "系统中已登记的任务",
+    enabledTasksNote: "参与自动调度的任务",
+    recentSuccessNote: "近期签到成功比例",
+    averageDurationNote: "接口平均响应毫秒数",
+    noTasks: "暂无签到任务，点击“新建任务”开始添加。",
+    noHistory: "暂无日志记录，任务触发后将在此处实时显示。",
+    enabled: "已启用",
+    disabled: "已禁用",
+    globalSchedule: "跟随全局定时",
+    timeout: "超时",
+    retry: "重试",
+    lastRun: "上次触发",
+    nextRun: "下次预定触发",
+    neverRun: "未运行",
+    noSchedule: "未设置定时",
+    lastDuration: "耗时",
+    run: "立即运行",
+    edit: "编辑",
+    del: "删除",
+    statusCode: "状态码",
+    duration: "耗时",
+    parseSuccess: "cURL 解析成功",
+    taskCreated: "任务创建成功",
+    taskUpdated: "任务更新成功",
+    taskDeleted: "任务已删除",
+    taskExecuted: "已触发任务执行",
+    allExecuted: "已触发所有已启用任务",
+    historyCleared: "日志历史记录已清空",
+    scheduleSaved: "全局定时设置已保存",
+    scheduleChecked: "定时检查已执行",
+    notifySaved: "通知设置已保存",
+    notifyTestSent: "测试通知已发送",
+    securitySaved: "安全设置已保存",
+    formReset: "表单已重置",
+    createTask: "新建签到任务",
+    editTaskPrefix: "编辑任务 #",
+    taskPreviewHint: "解析或编辑配置后，生成的请求数据将在此处预览。",
+    confirmDelete: "确定要删除此签到任务吗？",
+    confirmClear: "确定要清空所有历史日志记录吗？",
+    statusSuccess: "成功",
+    statusFailed: "失败",
+    statusIdle: "未运行",
+    healthSuccess: "签到成功次数",
+    healthFailed: "签到失败次数",
+    healthAvg: "平均响应耗时",
+    healthNoData: "暂无统计数据",
+    recentFeedEmpty: "近期无活动记录",
+    loadingData: "加载中...",
+    loadingAction: "处理中...",
+    taskSchedulePrefix: "独立 ",
+    aggressiveMode: "抢零点模式",
+    requestStartedAt: "发起时间",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -93,19 +93,18 @@ function setView(view) {
     };
 
     Object.entries(views).forEach(([key, element]) => {
-        element.classList.toggle("hidden", key !== view);
+        if (element) element.classList.toggle("hidden", key !== view);
     });
 
     const navView = view === "taskEditor" ? "tasks" : view;
 
     Object.entries(buttons).forEach(([key, element]) => {
-        element.classList.toggle("sidebar-btn-active", key === navView);
+        if (element) element.classList.toggle("sidebar-btn-active", key === navView);
     });
 
-    // 更新页面标题和顶栏操作按钮
-    const pageTitles = { overview: "总览", tasks: "任务", taskEditor: "编辑任务", settings: "设置" };
+    const pageTitles = { overview: "总览控制台", tasks: "任务中心", taskEditor: "任务配置", settings: "全局设置" };
     const titleEl = $("pageTitle");
-    if (titleEl) titleEl.textContent = pageTitles[view] || "总览";
+    if (titleEl) titleEl.textContent = pageTitles[view] || "总览控制台";
 
     renderTopbarActions();
 }
@@ -118,15 +117,13 @@ function renderTopbarActions() {
     let html = "";
     if (view === "overview") {
         html = `<button class="btn-ghost" id="refreshBtn">刷新数据</button>
-                <button class="btn-ghost" id="newTaskBtn">新建任务</button>
-                <button class="btn-ghost" id="runAllBtn">运行全部</button>`;
+                <button class="btn-ghost" id="newTaskBtn">+ 新建任务</button>
+                <button class="btn-primary" id="runAllBtn">运行所有已启用任务</button>`;
     } else if (view === "tasks") {
-        html = `<button class="btn-primary" id="taskPageNewBtn">创建新任务</button>
-                <button class="btn-ghost" id="runAllBtn">运行全部</button>`;
+        html = `<button class="btn-primary" id="taskPageNewBtn">+ 新建任务</button>
+                <button class="btn-ghost" id="runAllBtn">运行所有已启用任务</button>`;
     } else if (view === "taskEditor") {
-        html = `<button class="btn-ghost" id="taskEditorBackBtn">返回任务列表</button>`;
-    } else if (view === "settings") {
-        // 设置页面不需要额外操作按钮
+        html = `<button class="btn-ghost" id="taskEditorBackBtn">&larr; 返回任务列表</button>`;
     }
     container.innerHTML = html;
     rebindTopbarEvents();
@@ -137,7 +134,7 @@ function rebindTopbarEvents() {
     if (refreshBtn) refreshBtn.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => loadBootstrap().catch(handleError), TEXT.loadingData));
 
     const newTaskBtn = $("newTaskBtn");
-    if (newTaskBtn) newTaskBtn.addEventListener("click", () => { resetTask(); openTaskEditor(); });
+    if (newTaskBtn) newTaskBtn.addEventListener("click", () => { resetTask(false); openTaskEditor(); });
 
     const runAllBtn = $("runAllBtn");
     if (runAllBtn) runAllBtn.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => runAllTasks().catch(handleError)));
@@ -147,7 +144,6 @@ function rebindTopbarEvents() {
 
     const taskEditorBackBtn = $("taskEditorBackBtn");
     if (taskEditorBackBtn) taskEditorBackBtn.addEventListener("click", () => setView("tasks"));
-
 }
 
 function openTaskEditor() {
@@ -170,7 +166,14 @@ async function api(url, options = {}) {
 }
 
 function showMessage(text, type = "success") {
-    messageEl.textContent = text;
+    if (!messageEl) return;
+    messageEl.innerHTML = `
+        <div class="toast-content">
+            <span class="toast-icon">${type === "success" ? "✓" : "!"}</span>
+            <span>${escapeHTML(text)}</span>
+        </div>
+        <div class="toast-progress"></div>
+    `;
     messageEl.className = `toast toast-${type}`;
     window.clearTimeout(showMessage.timer);
     showMessage.timer = window.setTimeout(() => {
@@ -187,6 +190,16 @@ function escapeHTML(value) {
         .replaceAll("'", "&#39;");
 }
 
+function extractHost(urlStr) {
+    if (!urlStr) return "endpoint";
+    try {
+        const u = new URL(urlStr);
+        return u.hostname;
+    } catch (e) {
+        return urlStr.length > 25 ? urlStr.substring(0, 25) + "..." : urlStr;
+    }
+}
+
 function pad(value) {
     return String(value).padStart(2, "0");
 }
@@ -201,48 +214,6 @@ function statusLabel(status) {
     if (status === "success") return TEXT.statusSuccess;
     if (status === "failed") return TEXT.statusFailed;
     return TEXT.statusIdle;
-}
-
-function getTaskStatusTone(status) {
-    if (status === "success") return "tone-success";
-    if (status === "failed") return "tone-danger";
-    return "tone-neutral";
-}
-
-function createSkeletonLines(count) {
-    return Array.from({ length: count }, () => '<span class="skeleton-line"></span>').join("");
-}
-
-function renderSkeletonState() {
-    $("summaryGrid").innerHTML = Array.from({ length: 4 }, () => `
-        <div class="summary-card skeleton-card">
-            ${createSkeletonLines(3)}
-        </div>
-    `).join("");
-
-    $("taskList").innerHTML = Array.from({ length: 3 }, () => `
-        <div class="task-card skeleton-card">
-            ${createSkeletonLines(5)}
-        </div>
-    `).join("");
-
-    $("historyList").innerHTML = Array.from({ length: 2 }, () => `
-        <div class="history-card skeleton-card">
-            ${createSkeletonLines(5)}
-        </div>
-    `).join("");
-
-    $("healthBars").innerHTML = `
-        <div class="feed-item skeleton-card">
-            ${createSkeletonLines(4)}
-        </div>
-    `;
-
-    $("activityFeed").innerHTML = Array.from({ length: 3 }, () => `
-        <div class="feed-item skeleton-card">
-            ${createSkeletonLines(3)}
-        </div>
-    `).join("");
 }
 
 function setButtonLoading(button, isLoading, loadingText = TEXT.loadingAction) {
@@ -275,16 +246,9 @@ async function withButtonLoading(button, action, loadingText) {
 }
 
 function formatMethod(method) {
-    return `<span class="method-badge">${escapeHTML(method || "GET")}</span>`;
-}
-
-function renderMetaList(items) {
-    return items.map(([label, value]) => `
-        <div class="meta-item">
-            <span>${label}</span>
-            <strong>${escapeHTML(value)}</strong>
-        </div>
-    `).join("");
+    const m = (method || "GET").toUpperCase();
+    const cls = `method-${m.toLowerCase()}`;
+    return `<span class="method-badge ${cls}">${escapeHTML(m)}</span>`;
 }
 
 function getTaskActionMarkup(task) {
@@ -348,18 +312,26 @@ function getNextRunLabel(task) {
 }
 
 function renderSummary(stats) {
+    const grid = $("summaryGrid");
+    if (!grid) return;
+
+    const historyCount = state.history ? state.history.length : 0;
+    const successRate = historyCount > 0
+        ? Math.round(((stats.recent_success || 0) / historyCount) * 100)
+        : 100;
+
     const cards = [
         [TEXT.totalTasks, stats.total_tasks, TEXT.totalTasksNote],
         [TEXT.enabledTasks, stats.enabled_tasks, TEXT.enabledTasksNote],
-        [TEXT.recentSuccess, stats.recent_success, TEXT.recentSuccessNote],
+        [TEXT.recentSuccess, `${successRate}%`, TEXT.recentSuccessNote],
         [TEXT.averageDuration, `${stats.avg_duration_ms} ms`, TEXT.averageDurationNote],
     ];
 
-    $("summaryGrid").innerHTML = cards.map(([label, value, note]) => `
-        <div class="summary-card">
-            <span>${label}</span>
-            <strong>${value}</strong>
-            <p>${note}</p>
+    grid.innerHTML = cards.map(([label, value, note]) => `
+        <div class="stat-card">
+            <span class="stat-label">${label}</span>
+            <div class="stat-value">${value}</div>
+            <span class="stat-sub">${note}</span>
         </div>
     `).join("");
 }
@@ -370,7 +342,14 @@ function getFilteredTasks(tasks) {
         const name = String(task.name || "").toLowerCase();
         const url = String(task.url || "").toLowerCase();
         const matchesSearch = !search || name.includes(search) || url.includes(search);
-        const matchesFilter = state.taskFilter === "all" || (task.last_status || "idle") === state.taskFilter;
+
+        let matchesFilter = true;
+        if (state.taskFilter === "active") {
+            matchesFilter = !!task.enabled;
+        } else if (state.taskFilter !== "all") {
+            matchesFilter = (task.last_status || "idle") === state.taskFilter;
+        }
+
         return matchesSearch && matchesFilter;
     });
 }
@@ -378,42 +357,43 @@ function getFilteredTasks(tasks) {
 function renderTasks(tasks) {
     const filtered = getFilteredTasks(tasks);
     const target = $("taskList");
+    if (!target) return;
 
     if (!filtered.length) {
-        target.innerHTML = `<div class="task-card empty-card"><div class="empty-title">暂无匹配任务</div><div class="meta">${TEXT.noTasks}</div></div>`;
+        target.innerHTML = `<div class="card" style="grid-column:1/-1;text-align:center;padding:32px"><div style="font-weight:600;margin-bottom:4px">没有匹配的任务</div><div style="color:var(--text-muted);font-size:13px">${TEXT.noTasks}</div></div>`;
         return;
     }
 
     target.innerHTML = filtered.map((task) => `
-        <div class="task-card task-card-enhanced ${getTaskStatusTone(task.last_status)}">
-            <div class="task-top">
-                <div class="task-heading">
-                    <div class="task-title-row">
+        <div class="task-card">
+            <div class="task-card-head">
+                <div>
+                    <div style="display:flex;align-items:center;gap:8px">
                         <div class="task-title">${escapeHTML(task.name)}</div>
                         ${formatMethod(task.method)}
                     </div>
-                    <div class="meta task-url">${escapeHTML(task.url)}</div>
+                    <div class="task-url" title="${escapeHTML(task.url)}">${escapeHTML(extractHost(task.url))} &bull; ${escapeHTML(task.url)}</div>
                 </div>
-                <span class="status-badge ${statusClass(task.last_status)}">${statusLabel(task.last_status)}</span>
+                <label class="toggle" style="margin:0" title="切换启用状态">
+                    <input type="checkbox" ${task.enabled ? "checked" : ""} data-toggle-task-id="${task.id}">
+                </label>
             </div>
 
-            <div class="pill-row">
-                <span class="pill">${task.enabled ? TEXT.enabled : TEXT.disabled}</span>
-                <span class="pill">${task.schedule_enabled ? `${TEXT.taskSchedulePrefix}${pad(task.schedule_hour)}:${pad(task.schedule_minute)}:${pad(task.schedule_second)}` : TEXT.globalSchedule}</span>
-                <span class="pill">${TEXT.timeout} ${task.timeout_seconds}s</span>
-                <span class="pill">${TEXT.retry} ${task.retry_count}</span>
-                ${task.aggressive_mode ? `<span class="pill">${TEXT.aggressiveMode}</span>` : ""}
+            <div class="task-card-meta">
+                <span class="section-tag" style="margin:0;padding:2px 8px;border-radius:var(--radius-sm);background:rgba(255,255,255,0.05)">${statusLabel(task.last_status)}</span>
+                <span>定时: ${task.schedule_enabled ? `${pad(task.schedule_hour)}:${pad(task.schedule_minute)}:${pad(task.schedule_second)}` : TEXT.globalSchedule}</span>
+                <span>${TEXT.timeout}: ${task.timeout_seconds}s</span>
+                <span>${TEXT.retry}: ${task.retry_count}</span>
+                ${task.aggressive_mode ? `<span>${TEXT.aggressiveMode}</span>` : ""}
             </div>
 
-            <div class="meta-grid">
-                ${renderMetaList([
-                    [TEXT.lastRun, task.last_run_at || TEXT.neverRun],
-                    [TEXT.nextRun, getNextRunLabel(task)],
-                    [TEXT.lastDuration, `${task.last_duration_ms || 0} ms`],
-                ])}
+            <div style="font-size:12px;color:var(--text-muted);display:flex;flex-direction:column;gap:2px">
+                <div>${TEXT.lastRun}: ${task.last_run_at || TEXT.neverRun}</div>
+                <div>${TEXT.nextRun}: ${getNextRunLabel(task)}</div>
+                <div>${TEXT.lastDuration}: ${task.last_duration_ms || 0} ms</div>
             </div>
 
-            <div class="task-actions">
+            <div class="task-card-actions">
                 ${getTaskActionMarkup(task)}
             </div>
         </div>
@@ -422,40 +402,39 @@ function renderTasks(tasks) {
 
 function renderHistory(history) {
     const target = $("historyList");
+    if (!target) return;
 
     if (!history.length) {
-        target.innerHTML = `<div class="history-card empty-card"><div class="empty-title">暂无执行历史</div><div class="meta">${TEXT.noHistory}</div></div>`;
+        target.innerHTML = `<div class="card" style="text-align:center;padding:32px"><div style="font-weight:600;margin-bottom:4px">暂无运行日志</div><div style="color:var(--text-muted);font-size:13px">${TEXT.noHistory}</div></div>`;
         return;
     }
 
-    target.innerHTML = history.map((item) => `
-        <div class="history-card history-card-enhanced ${getTaskStatusTone(item.status)}">
-            <div class="task-top">
-                <div class="task-heading">
-                    <div class="task-title">${escapeHTML(item.task_name)}</div>
-                    <div class="meta">${escapeHTML(item.triggered_by)} / ${escapeHTML(item.created_at)}</div>
+    target.innerHTML = history.map((item) => {
+        const isSuccess = item.status === "success";
+        return `
+            <div class="history-item">
+                <div class="history-main-info">
+                    <span class="history-badge ${isSuccess ? "status-2xx" : "status-err"}">${item.status_code || (isSuccess ? 200 : 500)}</span>
+                    <div>
+                        <strong style="font-size:14px;color:var(--text);display:block">${escapeHTML(item.task_name)}</strong>
+                        <span style="font-size:12px;color:var(--text-muted)">${escapeHTML(item.triggered_by)} &bull; ${escapeHTML(item.created_at)}</span>
+                    </div>
                 </div>
-                <span class="status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
+                <div style="text-align:right">
+                    <span style="font-size:13px;font-family:monospace;color:var(--text-soft)">${item.response_time_ms || 0} ms</span>
+                    <div style="font-size:12px;color:var(--text-muted)">${escapeHTML(item.message || "")}</div>
+                </div>
             </div>
-
-            <div class="meta-grid compact-meta-grid">
-                ${renderMetaList([
-                    [TEXT.statusCode, String(item.status_code || 0)],
-                    [TEXT.duration, `${item.response_time_ms || 0} ms`],
-                    [TEXT.requestStartedAt, item.request_started_at || "-"],
-                ])}
-            </div>
-
-            <div class="history-message ${item.message ? "" : "history-message-muted"}">${escapeHTML(item.message || "暂无额外消息")}</div>
-            <pre class="history-preview">${escapeHTML(item.response_preview || "无响应预览")}</pre>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
 function renderHealthBars(history) {
     const target = $("healthBars");
+    if (!target) return;
+
     if (!history.length) {
-        target.innerHTML = `<div class="feed-item"><div class="meta">${TEXT.healthNoData}</div></div>`;
+        target.innerHTML = `<div style="color:var(--text-muted);font-size:13px">${TEXT.healthNoData}</div>`;
         return;
     }
 
@@ -466,22 +445,21 @@ function renderHealthBars(history) {
     );
 
     const rows = [
-        { label: TEXT.healthSuccess, value: successCount, total: history.length, className: "fill-success", suffix: `${successCount}/${history.length}` },
-        { label: TEXT.healthFailed, value: failedCount, total: history.length, className: "fill-failed", suffix: `${failedCount}/${history.length}` },
-        { label: TEXT.healthAvg, value: Math.min(avgDuration, 1000), total: 1000, className: "fill-neutral", suffix: `${avgDuration} ms` },
+        { label: TEXT.healthSuccess, value: successCount, total: history.length, isSuccess: true, suffix: `${successCount}/${history.length}` },
+        { label: TEXT.healthFailed, value: failedCount, total: history.length, isSuccess: false, suffix: `${failedCount}/${history.length}` },
+        { label: TEXT.healthAvg, value: Math.min(avgDuration, 1000), total: 1000, isSuccess: true, suffix: `${avgDuration} ms` },
     ];
 
     target.innerHTML = rows.map((row) => {
         const width = row.total > 0 ? Math.max(6, Math.round((row.value / row.total) * 100)) : 0;
+        const barClass = row.isSuccess ? "health-bar-fill-success" : "health-bar-fill-failed";
         return `
-            <div class="health-row">
-                <div class="health-label">
-                    <span>${row.label}</span>
-                    <strong>${row.suffix}</strong>
+            <div class="health-bar-item">
+                <div class="health-bar-label">${row.label}</div>
+                <div class="health-bar-track">
+                    <div class="${barClass}" style="width:${width}%"></div>
                 </div>
-                <div class="health-track">
-                    <div class="health-fill ${row.className}" style="width:${width}%"></div>
-                </div>
+                <div class="health-bar-meta">${row.suffix}</div>
             </div>
         `;
     }).join("");
@@ -489,19 +467,20 @@ function renderHealthBars(history) {
 
 function renderActivityFeed(history) {
     const target = $("activityFeed");
+    if (!target) return;
+
     if (!history.length) {
-        target.innerHTML = `<div class="feed-item empty-card"><div class="empty-title">暂无近期活动</div><div class="meta">${TEXT.recentFeedEmpty}</div></div>`;
+        target.innerHTML = `<div style="color:var(--text-muted);font-size:13px">${TEXT.recentFeedEmpty}</div>`;
         return;
     }
 
     target.innerHTML = history.slice(0, 4).map((item) => `
-        <div class="feed-item feed-item-enhanced ${getTaskStatusTone(item.status)}">
-            <div class="feed-top">
+        <div class="feed-item">
+            <div class="feed-left">
+                <span class="section-tag" style="margin:0">${statusLabel(item.status)}</span>
                 <strong>${escapeHTML(item.task_name)}</strong>
-                <span class="status-badge ${statusClass(item.status)}">${statusLabel(item.status)}</span>
             </div>
-            <div class="meta">${escapeHTML(item.created_at)}</div>
-            <div class="feed-message">${escapeHTML(item.message || "暂无额外消息")}</div>
+            <span class="feed-time">${escapeHTML(item.created_at)}</span>
         </div>
     `).join("");
 }
@@ -527,7 +506,6 @@ function fillSettings(data) {
 
 async function loadBootstrap() {
     state.loading.bootstrap = true;
-    renderSkeletonState();
     const { data } = await api("/api/bootstrap");
     state.tasks = data.tasks;
     state.history = data.history;
@@ -541,10 +519,26 @@ async function loadBootstrap() {
     state.loading.bootstrap = false;
 }
 
+function formatJSONText(text) {
+    if (!text || !text.trim()) return text;
+    try {
+        const obj = JSON.parse(text);
+        return JSON.stringify(obj, null, 2);
+    } catch (e) {
+        return text;
+    }
+}
+
 function getTaskPayload() {
     let headers = {};
     const headersText = $("taskHeaders").value.trim();
-    if (headersText) headers = JSON.parse(headersText);
+    if (headersText) {
+        try {
+            headers = JSON.parse(headersText);
+        } catch (e) {
+            throw new Error("请求头 JSON 格式不正确");
+        }
+    }
 
     return {
         name: $("taskName").value.trim(),
@@ -642,6 +636,16 @@ function resetTask(showToast = true) {
     if (showToast) showMessage(TEXT.formReset);
 }
 
+async function toggleTaskActive(id, enabled) {
+    const task = state.tasks.find((t) => t.id === id);
+    if (!task) return;
+    const payload = { ...task, enabled };
+    await api(`/api/tasks/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+    task.enabled = enabled;
+    showMessage(enabled ? "任务已启用" : "任务已禁用");
+    await loadBootstrap();
+}
+
 async function runTask(id) {
     state.taskActionKey = `run:${id}`;
     renderTasks(state.tasks);
@@ -736,10 +740,19 @@ async function saveSecurity() {
 }
 
 function bindTaskSearch() {
-    $("taskSearch").addEventListener("input", (event) => {
-        state.taskSearch = event.target.value;
-        renderTasks(state.tasks);
-    });
+    const searchEl = $("taskSearch");
+    if (searchEl) {
+        searchEl.addEventListener("input", (event) => {
+            state.taskSearch = event.target.value;
+            renderTasks(state.tasks);
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "/" && document.activeElement !== searchEl && document.activeElement.tagName !== "INPUT" && document.activeElement.tagName !== "TEXTAREA") {
+                e.preventDefault();
+                searchEl.focus();
+            }
+        });
+    }
 
     document.querySelectorAll("#statusFilters .filter-chip").forEach((button) => {
         button.addEventListener("click", () => {
@@ -751,55 +764,99 @@ function bindTaskSearch() {
         });
     });
 
-    $("taskList").addEventListener("click", (event) => {
-        const button = event.target.closest("button[data-task-action]");
-        if (!button) return;
+    const taskListEl = $("taskList");
+    if (taskListEl) {
+        taskListEl.addEventListener("change", (event) => {
+            const toggleInput = event.target.closest("input[data-toggle-task-id]");
+            if (toggleInput) {
+                const id = Number(toggleInput.dataset.toggleTaskId);
+                toggleTaskActive(id, toggleInput.checked).catch(handleError);
+            }
+        });
 
-        const id = Number(button.dataset.taskId);
-        const action = button.dataset.taskAction;
+        taskListEl.addEventListener("click", (event) => {
+            const button = event.target.closest("button[data-task-action]");
+            if (!button) return;
 
-        if (action === "run") {
-            runTask(id).catch(handleError);
-            return;
-        }
+            const id = Number(button.dataset.taskId);
+            const action = button.dataset.taskAction;
 
-        if (action === "edit") {
-            editTask(id);
-            return;
-        }
+            if (action === "run") {
+                runTask(id).catch(handleError);
+                return;
+            }
 
-        if (action === "delete") {
-            deleteTask(id).catch(handleError);
-        }
-    });
+            if (action === "edit") {
+                editTask(id);
+                return;
+            }
+
+            if (action === "delete") {
+                deleteTask(id).catch(handleError);
+            }
+        });
+    }
 }
 
 function attachEvents() {
-    $("navOverviewBtn").addEventListener("click", () => setView("overview"));
-    $("navTasksBtn").addEventListener("click", () => setView("tasks"));
-    $("navSettingsBtn").addEventListener("click", () => setView("settings"));
-    $("saveTaskBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveTask().catch(handleError)));
-    $("taskEditorNewBlankBtn").addEventListener("click", () => resetTask());
-    $("parseCurlBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
-    $("resetTaskBtn").addEventListener("click", () => resetTask());
-    $("clearHistoryBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => clearHistory().catch(handleError)));
-    $("saveScheduleBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSchedule().catch(handleError)));
-    $("checkScheduleBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => checkSchedule().catch(handleError)));
-    $("saveNotifyBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveNotify().catch(handleError)));
-    $("testNotifyBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => testNotify().catch(handleError)));
-    $("saveSecurityBtn").addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSecurity().catch(handleError)));
+    const navOverview = $("navOverviewBtn");
+    if (navOverview) navOverview.addEventListener("click", () => setView("overview"));
+    const navTasks = $("navTasksBtn");
+    if (navTasks) navTasks.addEventListener("click", () => setView("tasks"));
+    const navSettings = $("navSettingsBtn");
+    if (navSettings) navSettings.addEventListener("click", () => setView("settings"));
+
+    const saveTaskEl = $("saveTaskBtn");
+    if (saveTaskEl) saveTaskEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveTask().catch(handleError)));
+
+    const taskEditorNewBlank = $("taskEditorNewBlankBtn");
+    if (taskEditorNewBlank) taskEditorNewBlank.addEventListener("click", () => resetTask());
+
+    const parseCurlEl = $("parseCurlBtn");
+    if (parseCurlEl) parseCurlEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => parseCurl().catch(handleError)));
+
+    const resetTaskEl = $("resetTaskBtn");
+    if (resetTaskEl) resetTaskEl.addEventListener("click", () => resetTask());
+
+    const clearHistoryEl = $("clearHistoryBtn");
+    if (clearHistoryEl) clearHistoryEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => clearHistory().catch(handleError)));
+
+    const saveScheduleEl = $("saveScheduleBtn");
+    if (saveScheduleEl) saveScheduleEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSchedule().catch(handleError)));
+
+    const checkScheduleEl = $("checkScheduleBtn");
+    if (checkScheduleEl) checkScheduleEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => checkSchedule().catch(handleError)));
+
+    const saveNotifyEl = $("saveNotifyBtn");
+    if (saveNotifyEl) saveNotifyEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveNotify().catch(handleError)));
+
+    const testNotifyEl = $("testNotifyBtn");
+    if (testNotifyEl) testNotifyEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => testNotify().catch(handleError)));
+
+    const saveSecurityEl = $("saveSecurityBtn");
+    if (saveSecurityEl) saveSecurityEl.addEventListener("click", (event) => withButtonLoading(event.currentTarget, () => saveSecurity().catch(handleError)));
+
+    const taskHeadersEl = $("taskHeaders");
+    if (taskHeadersEl) {
+        taskHeadersEl.addEventListener("blur", () => {
+            taskHeadersEl.value = formatJSONText(taskHeadersEl.value);
+        });
+    }
+
     bindTaskSearch();
 
-    // 移动端侧边栏控制
     const mobileBtn = $("mobileMenuBtn");
     const sidebar = $("sidebar");
     if (mobileBtn && sidebar) {
         mobileBtn.addEventListener("click", () => {
             sidebar.classList.toggle("open");
         });
-        document.querySelector(".main-content").addEventListener("click", () => {
-            sidebar.classList.remove("open");
-        });
+        const mainContent = document.querySelector(".main-content");
+        if (mainContent) {
+            mainContent.addEventListener("click", () => {
+                sidebar.classList.remove("open");
+            });
+        }
     }
 }
 
