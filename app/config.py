@@ -50,3 +50,12 @@ def get_default_password() -> str:
     """获取默认管理员密码。"""
     val: str = os.getenv("QIANGDAO_DEFAULT_PASSWORD", "").strip()
     return val if val else DEFAULT_ADMIN_PASSWORD
+
+
+def is_docs_enabled() -> bool:
+    """获取是否启用 API 自动文档。
+
+    默认关闭 (False)，可通过设置环境变量 ENABLE_DOCS=true 开启。
+    """
+    val: str = os.getenv("ENABLE_DOCS", "false").strip().lower()
+    return val in ("true", "1", "yes", "on")

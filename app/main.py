@@ -21,7 +21,7 @@ from app.auth import (
     hash_password,
     is_authenticated,
 )
-from app.config import format_now, get_app_now
+from app.config import format_now, get_app_now, is_docs_enabled
 from app.curl_parser import normalize_task, parse_curl
 from app.models import (
     APIResponse,
@@ -52,7 +52,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         pass
 
 
-app = FastAPI(title="QianDao V2", lifespan=lifespan)
+docs_enabled = is_docs_enabled()
+app = FastAPI(
+    title="QianDao V2",
+    lifespan=lifespan,
+    docs_url="/docs" if docs_enabled else None,
+    redoc_url="/redoc" if docs_enabled else None,
+    openapi_url="/openapi.json" if docs_enabled else None,
+)
 
 # 挂载静态文件
 app.mount("/static", StaticFiles(directory="static"), name="static")
