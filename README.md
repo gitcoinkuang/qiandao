@@ -7,7 +7,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go Version">
   <img src="https://img.shields.io/badge/Gin-v1.10-008080?style=flat-square&logo=gin&logoColor=white" alt="Gin Framework">
-  <img src="https://img.shields.io/badge/License-MIT-blue.style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/License-MIT-blue" alt="License">
   <img src="https://img.shields.io/badge/Architecture-Single--File--Deploy-orange?style=flat-square" alt="Single File Deploy">
 </p>
 
